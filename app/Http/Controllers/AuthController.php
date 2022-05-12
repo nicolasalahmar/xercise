@@ -11,13 +11,26 @@ use App\Models\trainee;
 use App\Models\coach;
 use Illuminate\Auth\AuthenticationException;
 
-use Auth;   // you may need to change this to (use Illuminate\Support\Facades\Auth;)
+use Auth;
 use Storage;
 use DB;
 use DateTime;
 
 class AuthController extends Controller
 {
+    public function saveImage($usr_id,$encodedImage){
+        $imageName = 'user_'.($usr_id).'.jpg';
+        $imagePath = 'D:/Laravel Projects/Xercise/storage/app/Images/'.'user_'.($usr_id).'.jpg';
+        $encodedImage = base64_decode($encodedImage);
+        if(!gettype(file_put_contents($imagePath,$encodedImage)))
+        {
+            return false;
+        }
+        else {
+            DB::table('users')->where('usr_id',$usr_id)->update(['image'=>$imageName]);
+            return true;
+        }
+    }
 
     public function createUser(Request $request){
         $validator = Validator::make($request->all(),[
@@ -55,38 +68,35 @@ class AuthController extends Controller
             'type'=>$type,
         ]);
 
-        $image = 'user_'.((String)$user->usr_id).'.jpg';
-        $imagePath = 'D:/Laravel Projects/project_1/storage/Images/'.'user_'.((String)$user->usr_id).'.jpg';
-
         if($user->usr_id){
             if($request->type=='trainee'){
                 $b = $this->createTrainee($request,$user->usr_id);
-                if(gettype($b) == "boolean" && $b){
+                if(gettype($b) == "boolean" && $b){     //when it's not boolean validator error when it is false DB error when it's true DB correct
                     if($request->has('encodedImage')){
-                        $imageData = base64_decode($request->encodedImage);
-                        file_put_contents( $imagePath,$imageData );
-                        DB::table('users')->where('usr_id',$user->usr_id)->update(['image'=>$image]);
+                        if(!$this->saveImage((string)$user->usr_id,$request->encodedImage)){
+                            return response()->json(['success'=>true,'message'=>'Trainee created successfully','image'=>false]);
+                        }
                     }
-                    return response()->json(['success'=>true,'message'=>'Trainee created successfully']);
+                    return response()->json(['success'=>true,'message'=>'Trainee created successfully','image'=>true]);
                 }
                 else{
                     DB::table('users')->where('usr_id',$user->usr_id)->delete();
-                    return $b;
+                    return response()->json([$b]);
                 }
             }
             else{
                 $b = $this->createCoach($request,$user->usr_id);
                 if(gettype($b) == "boolean" && $b){
                     if($request->has('encodedImage')){
-                        $imageData = base64_decode($request->encodedImage);
-                        file_put_contents( $imagePath,$imageData );
-                        DB::table('users')->where('usr_id',$user->usr_id)->update(['image'=>$image]);
+                        if(!$this->saveImage((string)$user->usr_id,$request->encodedImage)){
+                            return response()->json(['success'=>true,'message'=>'Coach created successfully','image'=>false]);
+                        }
                     }
-                    return response()->json(['success'=>true,'message'=>'Coach created successfully']);
+                    return response()->json(['success'=>true,'message'=>'Coach created successfully','image'=>true]);
                 }
                 else{
                     DB::table('users')->where('usr_id',$user->usr_id)->delete();
-                    return response()->json(['success'=>false,'message'=>'Coach was not created and user was deleted']);
+                    return response()->json([$b]);
                 }
             }
         }
@@ -112,6 +122,7 @@ class AuthController extends Controller
     	if($validator->fails()){
     		return $validator->errors()->all();
     	}
+
         $DOB = $request->DOB;
         $height = $request->height;
         $weight = $request->weight;
@@ -122,7 +133,6 @@ class AuthController extends Controller
         $plank = $request->plank;
         $knee = $request->knee;
         $week_start = $request->week_start;
-
 
         $Trainee = trainee::query()->create([
         	'DOB'=>$DOB,
@@ -153,13 +163,25 @@ class AuthController extends Controller
     	]);
 
     	if($validator->fails()){
-    		return false;
+    		return $validator->errors()->all();
     	}
 
         $description = $request->description;
         $coach_num = $request->coach_num;
         $phone = $request->phone;
 
+        $contents = json_decode(Storage::get('coaches.json'),true);
+
+        //return $contents;
+        if (!isset( $contents[$coach_num])){
+            return response()->json(['success'=>false,'message'=>"coach id not found"],400);
+        }
+        else if ($contents[$coach_num]['active']){
+            return response()->json(['success'=>false,'message'=>"coach id already taken and active"],400);
+        }
+
+        $contents[$coach_num]['active']=true; //set coach to active
+        Storage::disk('local')->put('coaches.json', json_encode($contents));
 
         $coach = coach::query()->create([
         	'description'=>$description,
@@ -179,6 +201,7 @@ class AuthController extends Controller
 
     public function LogIn(Request $request){
         $validator = Validator::make($request->all(),[
+            'email'=>['required'],
     		'password'=>['required','min:8'],
     	]);
 
@@ -187,23 +210,25 @@ class AuthController extends Controller
     	}
 
         $password=$request->password;
+        $email=$request->email;
 
-        if(!$request->has('username') && !$request->has('email')){
-            return response()->json(['success'=>false,'message'=>'Please enter username or email']);
-        }
+        $userEmail = DB::table('users')->where('email',$email)->get('email');
 
-        if($request->has('username'))
-            $email = DB::table('users')->where('username',$username)->get('email');
-        else
-            $email=$request->email;
-
-        if(!Auth::attempt(['email'=>$email,'password'=>$password])){
-            if(DB::table('users')->where('email',$email)->exists()){
-                return response()->json(['success'=>false,'message'=>'Invalid password']);
+        if ($userEmail->isEmpty()){
+            $userUsername = DB::table('users')->where('username',$email)->get('email');
+            if ($userUsername->isEmpty()){
+                return response()->json(['success'=>false,'message'=>"User not found"],400);
             }
             else{
-                return response()->json(['success'=>false,'message'=>'User does not exist']);
+                $email = $userUsername[0]->email;
             }
+        }
+        else{
+            $email = $userEmail[0]->email;
+        }
+
+        if(!Auth::attempt(['email'=>$email,'password'=>$password])){
+            return response()->json(['success'=>false,'message'=>'Invalid password']);
         }
         $user = Auth::user();
         $token = $user->createToken('Personal Access Token');
