@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('coaches', function (Blueprint $table){
             $table->bigIncrements('coach_id');
             $table->longText('description');
-            $table->float('rating');
+            $table->float('rating')->default(0);
             $table->integer('coach_num');
             $table->string('phone');
         });

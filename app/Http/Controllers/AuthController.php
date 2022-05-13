@@ -44,7 +44,7 @@ class AuthController extends Controller
             'type'=>['required','in:trainee,coach'],
         ]);
         if($validator->fails()){
-            return $validator->errors()->all();
+            return response()->json(['success'=>false,"errors"=>$validator->errors()->all()]);
         }
 
         $request['password']=Hash::make($request['password']);
@@ -68,8 +68,8 @@ class AuthController extends Controller
             'type'=>$type,
         ]);
 
-        if($user->usr_id){
-            if($request->type=='trainee'){
+        if($user->usr_id){  //checking if record was successfuly created in DB
+            if($request->type=='trainee'){  //if user is trainee
                 $b = $this->createTrainee($request,$user->usr_id);
                 if(gettype($b) == "boolean" && $b){     //when it's not boolean validator error when it is false DB error when it's true DB correct
                     if($request->has('encodedImage')){
@@ -77,11 +77,11 @@ class AuthController extends Controller
                             return response()->json(['success'=>true,'message'=>'Trainee created successfully','image'=>false]);
                         }
                     }
-                    return response()->json(['success'=>true,'message'=>'Trainee created successfully','image'=>true]);
+                    return response()->json(['success'=>true,'message'=>'Trainee created successfully','image'=>true]); //NOTE: image is true when image is uploaded or when there is no image
                 }
                 else{
                     DB::table('users')->where('usr_id',$user->usr_id)->delete();
-                    return response()->json([$b]);
+                    return response()->json(['success'=>false,'errors'=>$b]);
                 }
             }
             else{
@@ -96,12 +96,12 @@ class AuthController extends Controller
                 }
                 else{
                     DB::table('users')->where('usr_id',$user->usr_id)->delete();
-                    return response()->json([$b]);
+                    return response()->json(['success'=>false,'errors'=>$b]);
                 }
             }
         }
         else{
-            return response()->json(['success'=>false,'message'=>'User could not be created.']);
+            return response()->json(['success'=>false,'errors'=>'User could not be created due to internal error.']);
         }
     }
 
@@ -174,10 +174,10 @@ class AuthController extends Controller
 
         //return $contents;
         if (!isset( $contents[$coach_num])){
-            return response()->json(['success'=>false,'message'=>"coach id not found"],400);
+            return response()->json(['success'=>false,'errors'=>"coach id not found"],400);
         }
         else if ($contents[$coach_num]['active']){
-            return response()->json(['success'=>false,'message'=>"coach id already taken and active"],400);
+            return response()->json(['success'=>false,'errors'=>"coach id already taken and active"],400);
         }
 
         $contents[$coach_num]['active']=true; //set coach to active
@@ -190,7 +190,6 @@ class AuthController extends Controller
             'usr_id'=>$usr_id,
             'rating'=>0,
         ]);
-
 
         if($coach->coach_id)
             return true;
@@ -233,7 +232,7 @@ class AuthController extends Controller
         $user = Auth::user();
         $token = $user->createToken('Personal Access Token');
 
-        return response()->json(['token'=>$token->accessToken,'token_type'=>'Bearer']);
+        return response()->json(['success'=>true,'token'=>$token->accessToken]);
     }
 
     public function logOut(){

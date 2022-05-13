@@ -22,7 +22,7 @@ return new class extends Migration
             $table->enum('gender',['Male','Female']);
             $table->string('image')->nullable();
             $table->enum('type',['coach','trainee','admin']);
-            $table->string('username');
+            $table->string('username')->unique();
             $table->timestamps();
         });
     }

@@ -27,11 +27,11 @@ class user extends Authenticatable
         'FirstName',
         'LastName',
         'email',
+        'username',
         'gender',
         'password',
         'image',
         'type',
-        'username'
     ];
 
     public $timestamps = true;
