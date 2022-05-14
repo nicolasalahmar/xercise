@@ -13,8 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('trainees', function (Blueprint $table) {
-            $table->bigIncrements('trainee_id');
+        Schema::create('users', function (Blueprint $table) {
+            $table->bigIncrements('user_id');
             $table->enum('week_start', ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']);
             $table->enum('times_a_week',['1','2','3','4','5']);
             $table->enum('time_per_day',['10','15','20','25','30','35','40']);
@@ -25,12 +25,17 @@ return new class extends Migration
             $table->float('height');
             $table->float('weight');
             $table->date('DOB');
+            $table->string('FirstName');
+            $table->string('LastName');
+            $table->string('email')->unique();
+            $table->string('password');
+            $table->enum('gender',['Male','Female']);
+            $table->string('image')->nullable();
+            $table->string('username')->unique();
+            $table->timestamps();
         });
 
-        Schema::table('trainees',function(Blueprint $table){
-        	$table->unsignedBigInteger('usr_id');
-        	$table->foreign('usr_id')->references('usr_id')->on('users')->onDelete('cascade');
-
+        Schema::table('users',function(Blueprint $table){
             $table->unsignedBigInteger('active_program_id')->nullable();
         	$table->foreign('active_program_id')->references('program_id')->on('programs')->onDelete('set null');
         });

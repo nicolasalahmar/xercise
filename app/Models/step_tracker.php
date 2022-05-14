@@ -9,7 +9,7 @@ class step_tracker extends Model
 {
     public $table='water_trackers';
 
-    public $fillable=['steps','trainee_id','date'];
+    public $fillable=['steps','user_id','date'];
 
     use HasFactory;
 }

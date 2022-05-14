@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
 
@@ -14,14 +16,9 @@ class user extends Authenticatable
     use HasFactory;
     use Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var string[]
-     */
-    public $table='users';
+    public $table = 'users';
 
-    protected $primaryKey = 'usr_id';
+    protected $primaryKey = 'user_id';
 
     protected $fillable = [
         'FirstName',
@@ -31,16 +28,19 @@ class user extends Authenticatable
         'gender',
         'password',
         'image',
-        'type',
+        'week_start',
+        'times_a_week',
+        'time_per_day',
+        'pushups',
+        'plank',
+        'knee',
+        'height',
+        'DOB',
+        'weight',
+        'usr_id',
+        'initial_plan',
+        'active_program_id',
     ];
 
     public $timestamps = true;
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array
-     */
-    protected $hidden = [
-        'password',
-    ];
 }

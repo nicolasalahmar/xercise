@@ -9,7 +9,7 @@ class sleep_tracker extends Model
 {
     public $table='sleep_trackers';
 
-    public $fillable=['hours','trainee_id','date'];
+    public $fillable=['hours','user_id','date'];
 
     use HasFactory;
 }

@@ -19,8 +19,8 @@ return new class extends Migration
         });
 
         Schema::table('sleep_trackers',function(Blueprint $table){
-        	$table->unsignedBigInteger('trainee_id');
-        	$table->foreign('trainee_id')->references('trainee_id')->on('trainees')->onDelete('cascade');
+        	$table->unsignedBigInteger('user_id');
+        	$table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
         });
     }
 

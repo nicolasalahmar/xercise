@@ -9,7 +9,7 @@ class rating_program extends Model
 {
     public $table='rating_programs';
 
-    public $fillable=['program_id','rating','trainee_id'];
+    public $fillable=['program_id','rating','user_id'];
 
     use HasFactory;
 }

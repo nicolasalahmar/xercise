@@ -44,6 +44,34 @@ return [
             'driver' => 'passport',
             'provider' => 'users',
         ],
+        'user' => [
+            'driver' => 'session',
+            'provider' => 'users',
+        ],
+
+        'user-api' => [
+            'driver' => 'token',
+            'provider' => 'users',
+        ],
+
+        'coach' => [
+            'driver' => 'session',
+            'provider' => 'coaches',
+        ],
+
+        'coach-api' => [
+            'driver' => 'token',
+            'provider' => 'coaches',
+        ],
+        'admin' => [
+            'driver' => 'session',
+            'provider' => 'admins',
+        ],
+
+        'admin-api' => [
+            'driver' => 'token',
+            'provider' => 'admins',
+        ],
     ],
 
     /*
@@ -66,13 +94,17 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => App\Models\User::class,
+            'model' => App\Models\user::class,
+        ],
+        'coaches' =>[
+            'driver' => 'eloquent',
+            'model' => App\Models\coach::class,
+        ],
+        'admins' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Admin::class,
         ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
     ],
 
     /*

@@ -3,7 +3,6 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -15,14 +14,5 @@ use App\Http\Controllers\AuthController;
 |
 */
 
-Route::prefix('auth')->middleware('auth:api')->group(function(){
-    Route::post('logout','AuthController@logOut');
-    Route::get('splash','AuthController@splashScreen');
+Route::group( ['prefix' => 'coach','middleware' => ['auth:coach-api','scopes:coach'] ],function(){
 });
-
-Route::prefix('auth')->group(function(){
-    Route::post('coach/sign-up','AuthController@createCoach');
-    Route::post('user/sign-up','AuthController@createUser');
-});
-
-Route::post('login',[AuthController::class, 'LogIn'])->name('LogIn');

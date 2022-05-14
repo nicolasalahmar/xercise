@@ -18,10 +18,10 @@ return new class extends Migration
         });
         Schema::table('rating_coaches',function(Blueprint $table){
             $table ->unsignedBigInteger('coach_id');
-            $table ->unsignedBigInteger('trainee_id');
+            $table ->unsignedBigInteger('user_id');
 
             $table ->foreign('coach_id')->references('coach_id')->on('coaches')->onDelete('cascade');
-            $table ->foreign('trainee_id')->references('trainee_id')->on('trainees')->onDelete('cascade');
+            $table ->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
     });
     }
 

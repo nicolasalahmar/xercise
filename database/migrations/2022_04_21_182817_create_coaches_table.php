@@ -19,13 +19,15 @@ return new class extends Migration
             $table->float('rating')->default(0);
             $table->integer('coach_num');
             $table->string('phone');
+            $table->string('FirstName');
+            $table->string('LastName');
+            $table->string('email')->unique();
+            $table->string('password');
+            $table->enum('gender',['Male','Female']);
+            $table->string('image')->nullable();
+            $table->string('username')->unique();
+            $table->timestamps();
         });
-
-        Schema::table('coaches',function(Blueprint $table){
-            $table ->unsignedBigInteger('usr_id');
-
-            $table ->foreign('usr_id')->references('usr_id')->on('users')->onDelete('cascade');
-    });
     }
 
     /**
