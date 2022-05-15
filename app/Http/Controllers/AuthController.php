@@ -191,14 +191,14 @@ class AuthController extends Controller
     public function coachLogin(Request $request)
     {
         if(!str_contains((string)$request->email,'@')){
-            $b = coach::query()->where('username',request('email'))->get('email');
-            if($b->isEmpty()){
+            $b = coach::query()->where('username',request('email'))->first('email');
+            if($b==null){
                 $success['email_correct'] = false;
                 $success['success'] = false;
                 return $success;
             }
             else{
-                $request->email = $b[0]['email'];
+                $request->email = $b['email'];
             }
         }
 
@@ -226,14 +226,14 @@ class AuthController extends Controller
     public function userLogin(Request $request)
     {
         if(!str_contains((string)$request->email,'@')){
-            $b = user::query()->where('username',request('email'))->get('email');
-            if($b->isEmpty()){
+            $b = user::query()->where('username',request('email'))->first('email');
+            if($b==null){
                 $success['email_correct'] = false;
                 $success['success'] = false;
                 return $success;
             }
             else{
-                $request->email = ($b)[0]['email'];
+                $request->email = $b['email'];
             }
         }
 
