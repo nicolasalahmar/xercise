@@ -16,15 +16,17 @@ return new class extends Migration
         Schema::create('programs', function (Blueprint $table) {
             $table->bigIncrements('program_id');
             $table->string('name');
-            $table->string('description');
-            $table->float('rating');
+            $table->longtext('description');
+            $table->float('rating')->default(0);
+            $table->enum('knee',['Yes','No','A little']);
+            $table->time('duration');
+            $table->enum('category',['muscle','weight','height','stretching']);
             $table->timestamps();
         });
 
         Schema::table('programs',function(Blueprint $table){
         	$table->unsignedBigInteger('coach_id');
-        	$table->foreign('coach_id')->references('coach_id')
-     			->on('coaches')->onDelete('cascade');
+        	$table->foreign('coach_id')->references('coach_id')->on('coaches')->onDelete('cascade');
         });
     }
 

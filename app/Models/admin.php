@@ -27,5 +27,7 @@ class admin extends Authenticatable
         'password',
     ];
 
+    protected $hidden = ['password'];
+
     public $timestamps = true;
 }

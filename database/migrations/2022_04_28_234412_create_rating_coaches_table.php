@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('rating_coaches', function (Blueprint $table) {
-            $table->float('rating');
+            $table->enum('rating',['1','2','3','4','5']);
         });
         Schema::table('rating_coaches',function(Blueprint $table){
             $table ->unsignedBigInteger('coach_id');

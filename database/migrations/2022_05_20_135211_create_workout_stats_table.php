@@ -13,17 +13,16 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('user_programs', function (Blueprint $table) {
-            $table->bigIncrements('user_program_id');
-            $table->date('date');
+        Schema::create('workout_stats', function (Blueprint $table) {
+            $table->bigIncrements('workout_stats_id');
+            $table->time('duration');
+            $table->float('Kcal');
+            $table->dateTime('dateTime');
         });
 
-        Schema::table('user_programs',function(Blueprint $table){
-        	$table->unsignedBigInteger('user_id');
+        Schema::table('workout_stats',function(Blueprint $table){
+            $table->unsignedBigInteger('user_id');
         	$table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
-
-            $table->unsignedBigInteger('program_id');
-        	$table->foreign('program_id')->references('program_id')->on('programs')->onDelete('cascade');
         });
     }
 
@@ -34,6 +33,6 @@ return new class extends Migration
      */
     public function down()
     {
-        //
+        Schema::dropIfExists('workout_stats');
     }
 };

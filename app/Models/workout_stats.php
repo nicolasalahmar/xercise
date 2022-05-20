@@ -5,16 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class user_program extends Model
+class workout_stats extends Model
 {
-    public $table = 'user_programs';
+    public $table = 'workout_stats';
 
-    protected $primaryKey = 'user_program _id';
+    protected $primaryKey = 'workout_stats_id';
 
     protected $fillable = [
         'user_id',
-        'program_id',
-        'date'
+        'duration',
+        'Kcal',
+        'dateTime',
     ];
 
     use HasFactory;

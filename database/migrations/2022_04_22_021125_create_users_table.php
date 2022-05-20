@@ -15,6 +15,14 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->bigIncrements('user_id');
+            $table->string('FirstName');
+            $table->string('LastName');
+            $table->string('username')->unique();
+            $table->string('email')->unique();
+            $table->string('password');
+            $table->enum('gender',['Male','Female']);
+            $table->string('image')->default(null)->nullable();
+            $table->date('DOB');
             $table->enum('week_start', ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']);
             $table->enum('times_a_week',['1','2','3','4','5']);
             $table->enum('time_per_day',['10','15','20','25','30','35','40']);
@@ -24,14 +32,8 @@ return new class extends Migration
             $table->enum('knee',['Yes','No','A little']);
             $table->float('height');
             $table->float('weight');
-            $table->date('DOB');
-            $table->string('FirstName');
-            $table->string('LastName');
-            $table->string('email')->unique();
-            $table->string('password');
-            $table->enum('gender',['Male','Female']);
-            $table->string('image')->nullable();
-            $table->string('username')->unique();
+            $table->integer('steps')->default(0);
+            $table->date('step_update')->default(date('Y-m-d'));
             $table->timestamps();
         });
 
@@ -48,6 +50,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('sleep_trackers');
+        Schema::dropIfExists('users');
     }
 };

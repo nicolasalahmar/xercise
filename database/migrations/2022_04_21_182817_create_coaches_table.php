@@ -15,17 +15,18 @@ return new class extends Migration
     {
         Schema::create('coaches', function (Blueprint $table){
             $table->bigIncrements('coach_id');
-            $table->longText('description');
-            $table->float('rating')->default(0);
-            $table->integer('coach_num');
-            $table->string('phone');
             $table->string('FirstName');
             $table->string('LastName');
+            $table->string('username')->unique();
             $table->string('email')->unique();
             $table->string('password');
+            $table->integer('coach_num');
             $table->enum('gender',['Male','Female']);
-            $table->string('image')->nullable();
-            $table->string('username')->unique();
+            $table->string('image')->nullable()->default(null);
+            $table->integer('programs')->default(0);
+            $table->longText('description');
+            $table->string('phone');
+            $table->float('rating')->default(0);
             $table->timestamps();
         });
     }

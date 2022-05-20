@@ -23,24 +23,27 @@ class user extends Authenticatable
     protected $fillable = [
         'FirstName',
         'LastName',
-        'email',
         'username',
-        'gender',
+        'email',
         'password',
+        'gender',
         'image',
+        'DOB',
         'week_start',
         'times_a_week',
         'time_per_day',
+        'initial_plan',
         'pushups',
         'plank',
         'knee',
         'height',
-        'DOB',
         'weight',
-        'usr_id',
-        'initial_plan',
         'active_program_id',
+        'steps',
+        'step_update'
     ];
+
+    protected $hidden = ['password'];
 
     public $timestamps = true;
 }

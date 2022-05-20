@@ -88,7 +88,7 @@ class AuthController extends Controller
         	'password'=>$password,
             'gender'=>$gender,
             'username'=>$username,
-            'image'=>null,
+           // 'image'=>null,
         	'DOB'=>$DOB,
             'height'=>$height,
             'weight'=>$weight,
@@ -99,7 +99,9 @@ class AuthController extends Controller
             'plank'=>$plank,
             'knee'=>$knee,
             'week_start'=>$week_start,
-            'active_program'=>null,
+            'active_program_id'=>null,
+           // 'steps'=>0,
+            //'step_update'=>date('Y-m-d'),
         ]);
         if($user->user_id){
             if($request->has('encodedImage'))
@@ -160,11 +162,10 @@ class AuthController extends Controller
         	'password'=>$password,
             'gender'=>$gender,
             'username'=>$username,
-            'image'=>null,
+            //'image'=>null,
         	'description'=>$description,
             'coach_num'=>$coach_num,
             'phone'=>$phone,
-            'rating'=>0,
         ]);
 
         if($coach->coach_id){

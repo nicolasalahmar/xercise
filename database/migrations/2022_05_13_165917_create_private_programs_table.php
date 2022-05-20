@@ -14,10 +14,10 @@ return new class extends Migration
     public function up()
     {
         Schema::create('private_programs', function (Blueprint $table) {
-            $table->bigIncrements('program_id');
+            $table->bigIncrements('private_program_id');
             $table->string('name');
-            $table->string('description');
-            $table->float('rating');
+            $table->longtext('description');
+            $table->time('duration');
             $table->timestamps();
         });
 

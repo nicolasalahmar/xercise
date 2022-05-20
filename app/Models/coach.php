@@ -20,19 +20,27 @@ class coach extends Authenticatable
 
     public $primaryKey='coach_id';
 
-    public $fillable=['description','rating','phone','coach_num',
+    public $fillable=[
     'FirstName',
     'LastName',
-    'email',
     'username',
-    'gender',
+    'email',
     'password',
-    'image',];
+    'gender',
+    'image',
+    'description',
+    'rating',
+    'phone',
+    'coach_num',
+    'programs',
+];
+
+    protected $hidden = ['password'];
 
     public $timestamps = true;
 
-    public function getAuthPassword()
+    /*public function getAuthPassword()
     {
         return $this->password;
-    }
+    }*/
 }
