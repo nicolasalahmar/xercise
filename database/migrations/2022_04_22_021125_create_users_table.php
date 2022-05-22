@@ -34,6 +34,7 @@ return new class extends Migration
             $table->float('weight');
             $table->integer('steps')->default(0);
             $table->date('step_update')->default(date('Y-m-d'));
+            $table->dateTime('duration')->default(date('1970-01-01 00:00:00'));
             $table->timestamps();
         });
 

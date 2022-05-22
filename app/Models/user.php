@@ -40,10 +40,12 @@ class user extends Authenticatable
         'weight',
         'active_program_id',
         'steps',
-        'step_update'
+        'step_update',
+        'duration',
     ];
 
     protected $hidden = ['password'];
 
     public $timestamps = true;
+
 }

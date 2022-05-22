@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\userController;
 use App\Http\Controllers\AuthController;
 /*
 |--------------------------------------------------------------------------
@@ -15,4 +16,7 @@ use App\Http\Controllers\AuthController;
 */
 
 Route::group( ['prefix' => 'user','middleware' => ['auth:user-api','scopes:user'] ],function(){
+    Route::get('showprofile','userController@showUserProfile');
+    Route::get('deleteaccount','userController@deleteUserAccount');
+    Route::post('editprofile','userController@editUserProfile');
 });

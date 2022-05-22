@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\coachController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -15,4 +16,8 @@ use App\Http\Controllers\AuthController;
 */
 
 Route::group( ['prefix' => 'coach','middleware' => ['auth:coach-api','scopes:coach'] ],function(){
+
+    Route::get('showprofile','coachController@showCoachProfile');
+    Route::get('deleteaccount','coachController@deleteCoachAccount');
+    Route::post('editprofile','coachController@editCoachProfile');
 });

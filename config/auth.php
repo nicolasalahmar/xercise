@@ -50,7 +50,7 @@ return [
         ],
 
         'user-api' => [
-            'driver' => 'token',
+            'driver' => 'passport',
             'provider' => 'users',
         ],
 
@@ -60,7 +60,7 @@ return [
         ],
 
         'coach-api' => [
-            'driver' => 'token',
+            'driver' => 'passport',
             'provider' => 'coaches',
         ],
         'admin' => [
@@ -69,7 +69,7 @@ return [
         ],
 
         'admin-api' => [
-            'driver' => 'token',
+            'driver' => 'passport',
             'provider' => 'admins',
         ],
     ],

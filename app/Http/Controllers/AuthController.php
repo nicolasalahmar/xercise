@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\user;
 use App\Models\coach;
 use Illuminate\Auth\AuthenticationException;
+use App\Models\constants;
 
 use Auth;
 use Storage;
@@ -20,7 +21,8 @@ class AuthController extends Controller
     public function saveImage($usr_id,$encodedImage,$type){
 
         $imageName = $type.'_'.($usr_id).'.jpg';
-        $imagePath = 'D:/Laravel Projects/Xercise/storage/app/Images/'.$type.'_'.($usr_id).'.jpg';
+        $imagePath = ((string)constants::image_path).$type.'_'.($usr_id).'.jpg';
+        //$imagePath = 'D:/Laravel Projects/Xercise/storage/app/Images/'.$type.'_'.($usr_id).'.jpg';
         $encodedImage = base64_decode($encodedImage);
         if(!gettype(file_put_contents($imagePath,$encodedImage)))
         {
