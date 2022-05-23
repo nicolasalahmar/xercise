@@ -164,4 +164,14 @@ class userController extends Controller
             return response()->json( ['success'=>$req->delete()]);
         }
 
+        public function viewUserDashboard(){
+            $users = user::query()->orderBy('duration')->get(['username','duration','image']);
+            return response()->json( [$users]);
+        }
+
+        public function viewCoachDashboard(){
+            $coaches = coach::query()->orderBy('rating', 'DESC')->get(['FirstName','LastName','rating','image']);
+            return response()->json( [$coaches]);
+        }
+
 }

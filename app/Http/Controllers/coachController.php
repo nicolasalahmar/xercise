@@ -104,5 +104,15 @@ class coachController extends Controller
         return response()->json( ['success, request deleted'=>$req->update(['status'=>'rejected'])]);
         //delete request from coaches menu when he declines it (remind frontend to do this)
     }
+    
+    public function viewUserDashboard(){
+        $users = user::query()->orderBy('duration')->get(['username','duration','image']);
+        return response()->json( [$users]);
+    }
+
+    public function viewCoachDashboard(){
+        $coaches = coach::query()->orderBy('rating', 'DESC')->get(['FirstName','LastName','rating','image']);
+        return response()->json( [$coaches]);
+    }
 
 }
