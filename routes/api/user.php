@@ -19,4 +19,5 @@ Route::group( ['prefix' => 'user','middleware' => ['auth:user-api','scopes:user'
     Route::get('showprofile','userController@showUserProfile');
     Route::get('deleteaccount','userController@deleteUserAccount');
     Route::post('editprofile','userController@editUserProfile');
+    Route::post('ratecoach/{coach_id}','userController@rateCoach');
 });
