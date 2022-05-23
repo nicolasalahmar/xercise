@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\constants;
 use Illuminate\Support\Facades\Validator;
 use App\Models\coach;
+use App\Models\user;
+use App\Models\requests;
 use Auth;
 use Storage;
 use DB;
@@ -37,8 +39,8 @@ class coachController extends Controller
     }
 
     public function deleteCoachAccount(Request $request){
-        $user = Auth::user();
-        return response()->json( ['success'=>$user->delete()]);
+        $coach = Auth::user();
+        return response()->json( ['success'=>$coach->delete()]);
     }
 
     public function editCoachProfile(Request $request){
@@ -72,7 +74,35 @@ class coachController extends Controller
         }
         else {
             return response()->json(["success"=>false, "message"=>"Error editing profile."]);
-        }
-
+        }  
     }
+
+    public function viewRequest(){
+        $coach = Auth::user(); //returns token's owner (user who owns the token)
+        $id = request()->query('request_id');
+        $req = requests::query()->where('request_id',$id)->where('coach_id',$coach->coach_id)->first();
+        $user_username = user::query()->where('user_id',$req->user_id)->get('username');
+        $req['user_username'] = $user_username;
+        return response()->json([$req]);
+    }
+
+    public function showCurrentRequests(){
+        $coach = Auth::user(); //returns token's owner (user who owns the token)
+        $req = requests::query()->where('coach_id',$coach->coach_id)->get(['name','objective','created_at','user_id']);
+
+        foreach($req as $r){
+            $user_username = user::query()->where('user_id',$r->user_id)->get('username');
+            $r['user_username'] = $user_username;
+        }
+        return response()->json([$req]);
+    }
+
+    public function declineRequest(){
+        $coach = Auth::user();
+        $id = request()->query('request_id');
+        $req = requests::query()->where('request_id',$id)->where('coach_id',$coach->coach_id)->first();
+        return response()->json( ['success, request deleted'=>$req->update(['status'=>'rejected'])]);
+        //delete request from coaches menu when he declines it (remind frontend to do this)
+    }
+
 }

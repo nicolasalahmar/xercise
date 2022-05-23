@@ -20,4 +20,7 @@ Route::group( ['prefix' => 'coach','middleware' => ['auth:coach-api','scopes:coa
     Route::get('showprofile','coachController@showCoachProfile');
     Route::get('deleteaccount','coachController@deleteCoachAccount');
     Route::post('editprofile','coachController@editCoachProfile');
+    Route::get('viewrequest','coachController@viewRequest');
+    Route::get('showcurrentrequests','coachController@showCurrentRequests');
+    Route::get('declinerequest','coachController@declineRequest');
 });
