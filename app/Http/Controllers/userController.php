@@ -8,6 +8,7 @@ use App\Models\constants;
 use App\Models\user;
 use App\Models\coach;
 use App\Models\rating_coach;
+use App\Models\requests;
 use Auth;
 use Storage;
 use DB;
@@ -131,5 +132,36 @@ class userController extends Controller
     }
 
 
+
+        public function viewRequest(){
+            $user = Auth::user(); //returns token's owner (user who owns the token)
+            $id = request()->query('request_id');
+            $req = requests::query()->where('request_id',$id)->where('user_id',$user->user_id)->first();
+            $coach_firstname = coach::query()->where('coach_id',$req->coach_id)->get('FirstName');
+            $coach_lastname = coach::query()->where('coach_id',$req->coach_id)->get('LastName');
+            $req['coach_firstname'] = $coach_firstname;
+            $req['coach_lastname'] = $coach_lastname;
+            return response()->json([$req]);
+        }
+
+        public function showCurrentRequests(){
+            $user = Auth::user(); //returns token's owner (user who owns the token)
+            $req = requests::query()->where('user_id',$user->user_id)->get(['name','status','created_at','coach_id']);
+
+            foreach($req as $r){
+                $coach_firstname = coach::query()->where('coach_id',$r->coach_id)->get('FirstName');
+                $coach_lastname = coach::query()->where('coach_id',$r->coach_id)->get('LastName');
+                $r['coach_firstname'] = $coach_firstname;
+                $r['coach_lastname'] = $coach_lastname;
+            }
+            return response()->json([$req]);
+        }
+
+        public function deleteRequest(){
+            $user = Auth::user();
+            $id = request()->query('request_id');
+            $req = requests::query()->where('request_id',$id)->where('user_id',$user->user_id)->first();
+            return response()->json( ['success, request deleted'=>$req->delete()]);
+        }
 
 }

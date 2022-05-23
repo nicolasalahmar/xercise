@@ -20,4 +20,8 @@ Route::group( ['prefix' => 'user','middleware' => ['auth:user-api','scopes:user'
     Route::get('deleteaccount','userController@deleteUserAccount');
     Route::post('editprofile','userController@editUserProfile');
     Route::post('ratecoach/{coach_id}','userController@rateCoach');
+    Route::get('viewrequest','userController@viewRequest');
+    Route::get('showcurrentrequests','userController@showCurrentRequests');
+    Route::get('deleterequest','userController@deleteRequest');  
+    
 });

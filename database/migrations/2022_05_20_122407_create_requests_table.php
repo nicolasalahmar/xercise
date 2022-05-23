@@ -15,10 +15,11 @@ return new class extends Migration
     {
         Schema::create('requests', function (Blueprint $table) {
             $table->bigIncrements('request_id');
+            $table->string('name');
             $table->longtext('message');
             $table->enum('time_per_day',['10','15','20','25','30','35','40']);
             $table->enum('status',['pending','accepted','rejected']);
-            $table->enum('objective',['weight','muscle','height','stretching']);
+            $table->string('objective');
             $table->enum('days',['1','2','3','4','5']);
             $table->timestamps();
         });
