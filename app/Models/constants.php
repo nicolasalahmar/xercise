@@ -10,6 +10,6 @@ class constants extends Model
     //this model is for storing constant values related to the project environment
     use HasFactory;
 
-    const image_path = 'C:/Users/georg/Desktop/xercise/storage/app/Images/';
+    const image_path = 'D:/Laravel Projects/git project/xercise/storage/app/Images';
 
 }
