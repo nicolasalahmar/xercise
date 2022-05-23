@@ -133,15 +133,15 @@ class userController extends Controller
 
 
 
-        public function viewRequest(){
+        public function viewRequest(){  //in request details in frontend add coach name/time of creation/delete status
             $user = Auth::user(); //returns token's owner (user who owns the token)
             $id = request()->query('request_id');
-            $req = requests::query()->where('request_id',$id)->where('user_id',$user->user_id)->first();
-            $coach_firstname = coach::query()->where('coach_id',$req->coach_id)->get('FirstName');
-            $coach_lastname = coach::query()->where('coach_id',$req->coach_id)->get('LastName');
-            $req['coach_firstname'] = $coach_firstname;
-            $req['coach_lastname'] = $coach_lastname;
-            return response()->json([$req]);
+            $req = requests::query()->where('request_id',$id)->first(); //delete second where
+            $coach_firstname = coach::query()->where('coach_id',$req->coach_id)->first('FirstName');
+            $coach_lastname = coach::query()->where('coach_id',$req->coach_id)->first('LastName');
+            $req['coach_firstname'] = $coach_firstname['FirstName'];
+            $req['coach_lastname'] = $coach_lastname['LastName'];
+            return response()->json($req);
         }
 
         public function showCurrentRequests(){
@@ -149,19 +149,19 @@ class userController extends Controller
             $req = requests::query()->where('user_id',$user->user_id)->get(['name','status','created_at','coach_id']);
 
             foreach($req as $r){
-                $coach_firstname = coach::query()->where('coach_id',$r->coach_id)->get('FirstName');
-                $coach_lastname = coach::query()->where('coach_id',$r->coach_id)->get('LastName');
-                $r['coach_firstname'] = $coach_firstname;
-                $r['coach_lastname'] = $coach_lastname;
+                $coach_firstname = coach::query()->where('coach_id',$r->coach_id)->first('FirstName');
+                $coach_lastname = coach::query()->where('coach_id',$r->coach_id)->first('LastName');
+                $r['coach_firstname'] = $coach_firstname['FirstName'];
+                $r['coach_lastname'] = $coach_lastname['LastName'];
             }
-            return response()->json([$req]);
+            return response()->json($req);
         }
 
         public function deleteRequest(){
             $user = Auth::user();
             $id = request()->query('request_id');
-            $req = requests::query()->where('request_id',$id)->where('user_id',$user->user_id)->first();
-            return response()->json( ['success, request deleted'=>$req->delete()]);
+            $req = requests::query()->where('request_id',$id)->first();
+            return response()->json( ['success'=>$req->delete()]);
         }
 
 }
