@@ -23,4 +23,6 @@ Route::group( ['prefix' => 'coach','middleware' => ['auth:coach-api','scopes:coa
     Route::get('viewrequest','coachController@viewRequest');
     Route::get('showcurrentrequests','coachController@showCurrentRequests');
     Route::get('declinerequest','coachController@declineRequest');
+    Route::get('viewuserdashboard','coachController@viewUserDashboard'); 
+    Route::get('viewcoachdashboard','coachController@viewCoachDashboard');
 });
