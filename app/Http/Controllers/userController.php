@@ -165,13 +165,13 @@ class userController extends Controller
         }
 
         public function viewUserDashboard(){
-            $users = user::query()->orderBy('duration')->get(['username','duration','image']);
-            return response()->json( [$users]);
+            $users = user::query()->orderBy('duration','DESC')->limit(100)->get(['username','duration','image']);
+            return response()->json( $users);
         }
 
         public function viewCoachDashboard(){
-            $coaches = coach::query()->orderBy('rating', 'DESC')->get(['FirstName','LastName','rating','image']);
-            return response()->json( [$coaches]);
+            $coaches = coach::query()->orderBy('rating', 'DESC')->limit(100)->get(['FirstName','LastName','rating','image']);
+            return response()->json( $coaches);
         }
 
 }

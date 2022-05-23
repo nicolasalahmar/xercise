@@ -74,45 +74,45 @@ class coachController extends Controller
         }
         else {
             return response()->json(["success"=>false, "message"=>"Error editing profile."]);
-        }  
+        }
     }
 
     public function viewRequest(){
         $coach = Auth::user(); //returns token's owner (user who owns the token)
         $id = request()->query('request_id');
         $req = requests::query()->where('request_id',$id)->where('coach_id',$coach->coach_id)->first();
-        $user_username = user::query()->where('user_id',$req->user_id)->get('username');
-        $req['user_username'] = $user_username;
-        return response()->json([$req]);
+        $user_username = user::query()->where('user_id',$req->user_id)->first('username');
+        $req['user_username'] = $user_username['username'];
+        return response()->json($req);
     }
 
     public function showCurrentRequests(){
         $coach = Auth::user(); //returns token's owner (user who owns the token)
-        $req = requests::query()->where('coach_id',$coach->coach_id)->get(['name','objective','created_at','user_id']);
+        $req = requests::query()->where('coach_id',$coach->coach_id)->where('status','pending')->get(['name','objective','created_at','user_id']);
 
         foreach($req as $r){
-            $user_username = user::query()->where('user_id',$r->user_id)->get('username');
-            $r['user_username'] = $user_username;
+            $user_username = user::query()->where('user_id',$r->user_id)->first('username');
+            $r['user_username'] = $user_username['username'];
         }
-        return response()->json([$req]);
+        return response()->json($req);
     }
 
     public function declineRequest(){
         $coach = Auth::user();
         $id = request()->query('request_id');
         $req = requests::query()->where('request_id',$id)->where('coach_id',$coach->coach_id)->first();
-        return response()->json( ['success, request deleted'=>$req->update(['status'=>'rejected'])]);
+        return response()->json( ['success'=>$req->update(['status'=>'rejected'])]);
         //delete request from coaches menu when he declines it (remind frontend to do this)
     }
-    
+
     public function viewUserDashboard(){
-        $users = user::query()->orderBy('duration')->get(['username','duration','image']);
-        return response()->json( [$users]);
+        $users = user::query()->orderBy('duration','DESC')->limit(100)->get(['username','duration','image']);
+        return response()->json( $users);
     }
 
     public function viewCoachDashboard(){
-        $coaches = coach::query()->orderBy('rating', 'DESC')->get(['FirstName','LastName','rating','image']);
-        return response()->json( [$coaches]);
+        $coaches = coach::query()->orderBy('rating', 'DESC')->limit(100)->get(['FirstName','LastName','rating','image']);
+        return response()->json( $coaches);
     }
 
 }
