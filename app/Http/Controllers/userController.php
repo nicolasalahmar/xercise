@@ -9,6 +9,11 @@ use App\Models\user;
 use App\Models\coach;
 use App\Models\rating_coach;
 use App\Models\requests;
+use App\Models\enroll;
+use App\Models\private_enroll;
+use App\Models\program;
+use App\Models\private_program;
+
 use Auth;
 use Storage;
 use DB;
@@ -166,12 +171,59 @@ class userController extends Controller
 
         public function viewUserDashboard(){
             $users = user::query()->orderBy('duration','DESC')->limit(100)->get(['username','duration','image']);
-            return response()->json( $users);
+            return response()->json($users);
         }
 
         public function viewCoachDashboard(){
             $coaches = coach::query()->orderBy('rating', 'DESC')->limit(100)->get(['FirstName','LastName','rating','image']);
-            return response()->json( $coaches);
+            return response()->json($coaches);
         }
+
+
+        public function viewUserPlans(){
+            $user = Auth::user();
+
+            $user_public_plans = enroll::query()->where('user_id', $user->user_id)->get('program_id');
+            $user_private_plans = private_enroll::query()->where('user_id', $user->user_id)->get('private_program_id');
+
+            foreach($user_public_plans as $plan){
+                $current_plan = program::query()->where('program_id',$plan->program_id)->first('name');
+                $plan['plan_name'] = $current_plan['name'];
+
+                $author = coach::query()->where('coach_id',$current_plan->coach_id)->first();
+            
+                if($author==null){
+                    $author = 'Xercise';
+                    $plan['author'] = $author;
+                    $plan['plan_type'] = 'Default By Xercise';
+                }else{
+                    $author_firstname = $author->FirstName;
+                    $author_lastname = $author->LastName;
+                    $plan['author'] = $author_firstname.' '.$author_lastname;
+                    $plan['plan_type'] = 'By Coach';
+                }
+            }
+            foreach($user_private_plans as $plan){
+                $current_plan = private_program::query()->where('private_program_id',$plan->private_program_id)->first('name');
+                $plan['plan_name'] = $current_plan['name'];
+
+                $author = coach::query()->where('coach_id',$current_plan->coach_id)->first();
+                
+                if($author==null){
+                    $author = $user->username;
+                    $plan['author'] = $author;
+                    $plan['plan_type'] = 'Custom Plan';
+                }else{
+                    $author_firstname = $author->FirstName;
+                    $author_lastname = $author->LastName;
+                    $plan['author'] = $author_firstname.' '.$author_lastname;
+                    $plan['plan_type'] = 'Requested from Coach';
+            }
+        }
+            $a1 = $user_public_plans->toArray();
+            $a2 = $user_private_plans->toArray();
+            
+            return response()->json(array_merge($a1,$a2));
+    }
 
 }

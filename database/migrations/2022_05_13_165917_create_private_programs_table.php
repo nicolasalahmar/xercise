@@ -22,7 +22,7 @@ return new class extends Migration
         });
 
         Schema::table('private_programs',function(Blueprint $table){
-        	$table->unsignedBigInteger('coach_id');
+        	$table->unsignedBigInteger('coach_id')->nullable();
         	$table->foreign('coach_id')->references('coach_id')
      			->on('coaches')->onDelete('cascade');
 

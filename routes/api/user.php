@@ -25,5 +25,5 @@ Route::group( ['prefix' => 'user','middleware' => ['auth:user-api','scopes:user'
     Route::get('deleterequest','userController@deleteRequest');  
     Route::get('viewuserdashboard','userController@viewUserDashboard'); 
     Route::get('viewcoachdashboard','userController@viewCoachDashboard');
-    
+    Route::get('viewuserplans','userController@viewUserPlans');
 });
