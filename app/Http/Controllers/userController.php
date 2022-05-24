@@ -224,6 +224,7 @@ class userController extends Controller
             $a2 = $user_private_plans->toArray();
             
             return response()->json(array_merge($a1,$a2));
+            //2mak
     }
 
 }
