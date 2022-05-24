@@ -22,8 +22,8 @@ Route::group( ['prefix' => 'user','middleware' => ['auth:user-api','scopes:user'
     Route::post('ratecoach/{coach_id}','userController@rateCoach');
     Route::get('viewrequest','userController@viewRequest');
     Route::get('showcurrentrequests','userController@showCurrentRequests');
-    Route::get('deleterequest','userController@deleteRequest');  
-    Route::get('viewuserdashboard','userController@viewUserDashboard'); 
+    Route::get('deleterequest','userController@deleteRequest');
+    Route::get('viewuserdashboard','userController@viewUserDashboard');
     Route::get('viewcoachdashboard','userController@viewCoachDashboard');
-    
+
 });
