@@ -186,45 +186,48 @@ class userController extends Controller
             $user_public_plans = enroll::query()->where('user_id', $user->user_id)->get('program_id');
             $user_private_plans = private_enroll::query()->where('user_id', $user->user_id)->get('private_program_id');
 
-            foreach($user_public_plans as $plan){
-                $current_plan = program::query()->where('program_id',$plan->program_id)->first('name');
-                $plan['plan_name'] = $current_plan['name'];
+            $a1 = array();
 
-                $author = coach::query()->where('coach_id',$current_plan->coach_id)->first();
-            
-                if($author==null){
-                    $author = 'Xercise';
-                    $plan['author'] = $author;
-                    $plan['plan_type'] = 'Default By Xercise';
-                }else{
-                    $author_firstname = $author->FirstName;
-                    $author_lastname = $author->LastName;
-                    $plan['author'] = $author_firstname.' '.$author_lastname;
-                    $plan['plan_type'] = 'By Coach';
+            foreach($user_public_plans as $plan)
+            {
+                $temp = program::where('program_id', $plan['program_id'])->first();
+                $firstName=coach::where('coach_id', $temp['coach_id'])->first('firstName');
+                $lastName=coach::where('coach_id', $temp['coach_id'])->first('lastName');
+
+                if($firstName == NULL)
+                {
+                    $temp['author']='Xercise';
                 }
-            }
-            foreach($user_private_plans as $plan){
-                $current_plan = private_program::query()->where('private_program_id',$plan->private_program_id)->first('name');
-                $plan['plan_name'] = $current_plan['name'];
+                else
+                {
+                    $firstName=$firstName['firstName'];
+                    $lastName=$lastName['lastName'];
+                    $temp['author']=$firstName.' '.$lastName;
+                }
 
-                $author = coach::query()->where('coach_id',$current_plan->coach_id)->first();
-                
-                if($author==null){
-                    $author = $user->username;
-                    $plan['author'] = $author;
-                    $plan['plan_type'] = 'Custom Plan';
-                }else{
-                    $author_firstname = $author->FirstName;
-                    $author_lastname = $author->LastName;
-                    $plan['author'] = $author_firstname.' '.$author_lastname;
-                    $plan['plan_type'] = 'Requested from Coach';
+                array_push($a1,$temp);
             }
-        }
-            $a1 = $user_public_plans->toArray();
-            $a2 = $user_private_plans->toArray();
-            
+            $a2 = array();
+            foreach($user_private_plans as $plan)
+            {
+                $temp = private_program::where('private_program_id', $plan['private_program_id'])->first();
+                $firstName=coach::where('coach_id', $temp['coach_id'])->first('firstName');
+                $lastName=coach::where('coach_id', $temp['coach_id'])->first('lastName');
+
+                if($firstName == NULL)
+                {
+                    $temp['author']='Custom Plan';
+                }
+                else
+                {
+                    $firstName=$firstName['firstName'];
+                    $lastName=$lastName['lastName'];
+                    $temp['author']=$firstName.' '.$lastName;
+                }
+
+                array_push($a2,$temp);
+            }
             return response()->json(array_merge($a1,$a2));
-            //2mak
     }
 
 }
