@@ -228,6 +228,10 @@ class userController extends Controller
                 array_push($a2,$temp);
             }
             return response()->json(array_merge($a1,$a2));
+<<<<<<< HEAD
+=======
+
+>>>>>>> 783879425b717e3ac13382531b28aadf6b0da613
     }
 
 }
