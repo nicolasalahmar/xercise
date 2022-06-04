@@ -21,15 +21,6 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::table('private_programs',function(Blueprint $table){
-        	$table->unsignedBigInteger('coach_id')->nullable();
-        	$table->foreign('coach_id')->references('coach_id')
-     			->on('coaches')->onDelete('cascade');
-
-                 $table->unsignedBigInteger('user_id');
-                 $table->foreign('user_id')->references('user_id')
-                      ->on('users')->onDelete('cascade');
-        });
     }
 
     /**

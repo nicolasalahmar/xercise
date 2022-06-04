@@ -37,11 +37,6 @@ return new class extends Migration
             $table->time('duration')->default(0);
             $table->timestamps();
         });
-
-        Schema::table('users',function(Blueprint $table){
-            $table->unsignedBigInteger('active_program_id')->nullable();
-        	$table->foreign('active_program_id')->references('program_id')->on('programs')->onDelete('set null');
-        });
     }
 
     /**

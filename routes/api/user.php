@@ -26,4 +26,6 @@ Route::group( ['prefix' => 'user','middleware' => ['auth:user-api','scopes:user'
     Route::get('viewuserdashboard','userController@viewUserDashboard');
     Route::get('viewcoachdashboard','userController@viewCoachDashboard');
     Route::get('viewuserplans','userController@viewUserPlans');
+    Route::get('returnactiveplan','userController@viewActivePlan');
+    Route::post('activateplan','userController@activatePlan');
 });

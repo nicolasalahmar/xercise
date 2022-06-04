@@ -39,6 +39,7 @@ class user extends Authenticatable
         'height',
         'weight',
         'active_program_id',
+        'active_private_program_id',
         'steps',
         'step_update',
         'duration',

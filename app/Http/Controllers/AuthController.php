@@ -102,6 +102,7 @@ class AuthController extends Controller
             'knee'=>$knee,
             'week_start'=>$week_start,
             'active_program_id'=>null,
+            'active_private_program_id'=>null,
            // 'steps'=>0,
             //'step_update'=>date('Y-m-d'),
         ]);

@@ -19,11 +19,6 @@ return new class extends Migration
             $table->float('Kcal');
             $table->dateTime('dateTime');
         });
-
-        Schema::table('workout_stats',function(Blueprint $table){
-            $table->unsignedBigInteger('user_id');
-        	$table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
-        });
     }
 
     /**

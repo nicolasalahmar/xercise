@@ -16,6 +16,8 @@ class workout_stats extends Model
         'duration',
         'Kcal',
         'dateTime',
+        'program_id',
+        'private_program_id',
     ];
 
     use HasFactory;
