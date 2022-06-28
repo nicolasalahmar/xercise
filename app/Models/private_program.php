@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Database\Factories\privateProgramFactory;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -16,4 +18,9 @@ class private_program extends Model
     public $fillable=['name','description','coach_id','user_id','duration'];
 
     public $timestamps=true;
+
+    protected static function newFactory()
+    {
+        return privateProgramFactory::new();
+    }
 }
