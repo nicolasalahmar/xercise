@@ -14,18 +14,17 @@ return new class extends Migration
     public function up()
     {
         Schema::create('private_enrolls', function (Blueprint $table) {
-        $table->bigIncrements('private_enroll_id');
-        $table->date('date');
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
+
+            $table->unsignedBigInteger('private_program_id');
+            $table->foreign('private_program_id')->references('private_program_id')->on('private_programs')->onDelete('cascade');
+            $table->primary(['user_id', 'private_program_id']);
+
         $table->boolean('done');
+        $table->timestamps();
     });
 
-    Schema::table('private_enrolls',function(Blueprint $table){
-        $table->unsignedBigInteger('user_id');
-        $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
-
-        $table->unsignedBigInteger('private_program_id');
-        $table->foreign('private_program_id')->references('private_program_id')->on('private_programs')->onDelete('cascade');
-    });
     }
 
     /**

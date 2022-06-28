@@ -14,17 +14,16 @@ return new class extends Migration
     public function up()
     {
         Schema::create('enrolls', function (Blueprint $table) {
-            $table->bigIncrements('enroll_id');
-            $table->date('date');
-            $table->boolean('done');
-        });
-
-        Schema::table('enrolls',function(Blueprint $table){
-        	$table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('user_id');
         	$table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
 
             $table->unsignedBigInteger('program_id');
         	$table->foreign('program_id')->references('program_id')->on('programs')->onDelete('cascade');
+
+            $table->primary(['user_id', 'program_id']);
+
+            $table->boolean('done');
+            $table->timestamps();
         });
     }
 

@@ -14,18 +14,17 @@ return new class extends Migration
     public function up()
     {
         Schema::create('exercise_programs', function (Blueprint $table) {
-            $table->bigIncrements('ex_prg_id');
-            $table->integer('reps');
-            $table->time('duration');
-        });
-
-        Schema::table('exercise_programs',function(Blueprint $table){
             $table ->unsignedBigInteger('ex_id');
             $table ->unsignedBigInteger('program_id');
 
             $table ->foreign('ex_id')->references('ex_id')->on('exercises')->onDelete('cascade');
             $table ->foreign('program_id')->references('program_id')->on('programs')->onDelete('cascade');
-    });
+
+            $table->primary(['ex_id','program_id']);
+
+            $table->integer('reps');
+            $table->time('duration');
+        });
     }
 
     /**
