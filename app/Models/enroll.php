@@ -9,14 +9,15 @@ class enroll extends Model
 {
     public $table = 'enrolls';
 
-    protected $primaryKey = 'enroll_id';
+    protected $primaryKey = ['user_id', 'program_id'];
 
     protected $fillable = [
-        'user_id',
-        'program_id',
-        'date',
         'done',
     ];
+
+    public $incrementing = false;
+
+    public $timestamps = true;
 
     use HasFactory;
 }

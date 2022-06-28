@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Database\Factories\privateEnrollFactory;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -9,14 +11,20 @@ class private_enroll extends Model
 {
     public $table = 'private_enrolls';
 
-    protected $primaryKey = 'private_enroll_id';
+    protected $primaryKey = ['user_id', 'private_program_id'];
 
     protected $fillable = [
-        'user_id',
-        'private_program_id',
-        'date',
         'done',
     ];
+
+    public $incrementing = false;
+
+    public $timestamps = true;
+
+    protected static function newFactory()
+    {
+        return privateEnrollFactory::new();
+    }
 
     use HasFactory;
 }
