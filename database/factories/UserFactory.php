@@ -17,12 +17,27 @@ class UserFactory extends Factory
      */
     public function definition()
     {
+        $gender = $this->faker->randomElement(['male', 'female']);
+
         return [
-            'name' => $this->faker->name(),
+            'FirstName' => $this->faker->firstName($gender),
+            'LastName' => $this->faker->lastName($gender),
+            'username' => $this->faker->unique()->name(),
             'email' => $this->faker->unique()->safeEmail(),
-            'email_verified_at' => now(),
-            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
-            'remember_token' => Str::random(10),
+            'password' => '$2y$10$QT.snXcMwJJuOKNcS5EbW.PoTO1L8wfp11VuHk83zt10qD/XvuQ0q', // password
+            'gender'=>$gender,
+            'image'=>'users_1.jpg',
+            'DOB'=>$this->faker->date($format = 'Y-m-d', $max = 'now'),
+            'week_start'=>$this->faker->randomElement(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']),
+            'times_a_week'=>$this->faker->randomElement(['1','2','3','4','5']),
+            'time_per_day'=>$this->faker->randomElement(['10','15','20','25','30','35','40']),
+            'initial_plan'=>$this->faker->randomElement(['muscle','weight','height','stretching']),
+            'pushups'=>$this->faker->randomElement(['0-5','5-10','10-20','20-30','35+']),
+            'plank'=>$this->faker->randomElement(['0-5','5-10','10-20','20-30','35+']),
+            'knee'=>$this->faker->randomElement(['Yes','No','A little']),
+            'height'=>$this->faker->numberBetween(120,200),
+            'weight'=>$this->faker->numberBetween(50,100),
+            'steps'=>$this->faker->numberBetween(1,20)
         ];
     }
 
