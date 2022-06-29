@@ -306,6 +306,10 @@ class userController extends Controller
             $req = enroll::query()->where('user_id', $user->user_id)->where('program_id',$request->program_id)->delete();
             return response()->json( ['success'=>$req]);
         }
+        if($request->has('private_program_id')){
+            $req = private_enroll::query()->where('user_id', $user->user_id)->where('private_program_id',$request->private_program_id)->delete();
+            return response()->json( ['success'=>$req]);
+        }
     }
 
 }
