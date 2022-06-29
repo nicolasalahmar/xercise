@@ -189,6 +189,12 @@ class userController extends Controller
         return response()->json(['message'=>$enroll->save()]);
     }
 
+    public function resetPlanProgress(Request $request){
+        $user = Auth::user();
+
+
+    }
+
     public function viewUserPlans(){
         $user = Auth::user();
 
