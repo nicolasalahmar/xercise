@@ -303,8 +303,8 @@ class userController extends Controller
     public function deletePlan(Request $request){
         $user = Auth::user();
         if($request->has('program_id')){
-        $req = enroll::query()->where('user_id', $user->user_id)->where('program_id',$request->program_id)->first();
-        return response()->json( ['success'=>$req->delete()]); 
+            $req = enroll::query()->where('user_id', $user->user_id)->where('program_id',$request->program_id)->delete();
+            return response()->json( ['success'=>$req]);
         }
     }
 
