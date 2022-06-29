@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\constants;
 use App\Models\user;
 use App\Models\coach;
+use App\Models\workout_stats;
 use App\Models\rating_coach;
 use App\Models\requests;
 use App\Models\enroll;
@@ -183,7 +184,7 @@ class userController extends Controller
         $user = Auth::user();
         $enroll = new enroll();
         $enroll->user_id = $user->user_id;
-        $enroll->program_id = $request->plan_id;
+        $enroll->program_id = $request->program_id;
         $enroll->done = false;
 
         return response()->json(['message'=>$enroll->save()]);
@@ -191,8 +192,15 @@ class userController extends Controller
 
     public function resetPlanProgress(Request $request){
         $user = Auth::user();
-
-
+        if($request->has('program_id')){
+           return response()->json(['message'=> workout_stats::query()->where('user_id',$user->user_id)->where('program_id',$request->program_id)->delete()]);
+        }
+        elseif($request->has('private_program_id')){
+            return response()->json(['message'=> workout_stats::query()->where('user_id',$user->user_id)->where('private_program_id',$request->private_program_id)->delete()]);
+        }
+        else{
+            return response()->json(['message'=>'no program_id or private_program_id provided']);
+        }
     }
 
     public function viewUserPlans(){

@@ -29,4 +29,5 @@ Route::group( ['prefix' => 'user','middleware' => ['auth:user-api','scopes:user'
     Route::get('returnactiveplan','userController@viewActivePlan');
     Route::post('activateplan','userController@activatePlan');
     Route::post('enroll','userController@enroll');
+    Route::post('resetplanprogress','userController@resetPlanProgress');
 });
