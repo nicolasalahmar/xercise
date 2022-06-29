@@ -17,7 +17,7 @@ return new class extends Migration
             $table->bigIncrements('workout_stats_id');
             $table->time('duration');
             $table->float('Kcal');
-            $table->dateTime('dateTime');
+            $table->timestamps();
         });
     }
 
