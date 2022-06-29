@@ -298,6 +298,16 @@ class userController extends Controller
             return response()->json(['success' => false,'message' => 'No program id provided'], 400);
         }
     }
+
+//to remove a plan from my plans in user
+    public function deletePlan(Request $request){
+        $user = Auth::user();
+        if($request->has('program_id')){
+        $req = enroll::query()->where('user_id', $user->user_id)->where('program_id',$request->program_id)->first();
+        return response()->json( ['success'=>$req->delete()]); 
+        }
+    }
+
 }
 
 

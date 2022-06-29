@@ -30,4 +30,6 @@ Route::group( ['prefix' => 'user','middleware' => ['auth:user-api','scopes:user'
     Route::post('activateplan','userController@activatePlan');
     Route::post('enroll','userController@enroll');
     Route::post('resetplanprogress','userController@resetPlanProgress');
+    Route::post('deleteuserplan','userController@deletePlan');
+
 });
