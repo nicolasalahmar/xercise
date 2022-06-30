@@ -11,9 +11,10 @@ class rating_coach extends Model
 
     protected $primaryKey = ['user_id', 'coach_id'];
 
-    public $fillable=['user_id','rating','coach_id'];
+    public $fillable=['rating'];
 
     public $timestamps = false;
+
     public $incrementing = false;
 
     use HasFactory;

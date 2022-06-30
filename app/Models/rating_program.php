@@ -9,7 +9,9 @@ class rating_program extends Model
 {
     public $table='rating_programs';
 
-    public $fillable=['program_id','rating','user_id'];
+    protected $primaryKey = ['user_id', 'program_id'];
+
+    public $fillable=['rating'];
 
     use HasFactory;
 }
