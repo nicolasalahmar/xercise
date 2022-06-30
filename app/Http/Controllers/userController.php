@@ -315,4 +315,15 @@ class userController extends Controller
         $result = DB::table('sleep_trackers')->where('user_id',$user->user_id)->delete();
         return response()->json(['message'=>(boolean)$result]);
     }
+
+    public function discoverCoaches(){
+        $coaches = coach::query()->orderBy('rating', 'DESC')->take(30)->get(['coach_id','FirstName','LastName','gender','rating','programs','image']);
+        return response()->json($coaches);
+    }
+
+    public function viewCoachAndPlans(Request $request){
+        return true;
+        $coach = coach::query()->where('coach_id',$request->coach_id)->get(['coach_id','FirstName','LastName','gender','rating','programs','image','description','phone','email']);
+        return response()->json($coach);
+    }
 }
