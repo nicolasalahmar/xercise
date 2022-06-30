@@ -172,7 +172,7 @@ class userController extends Controller
 
         return response()->json(['message'=>'deleted successfully']);
     }
-
+//
     //step counter functions
     public function calculateSteps(Request $request){
         $user = Auth::user();
