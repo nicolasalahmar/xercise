@@ -334,9 +334,8 @@ class userController extends Controller
     }
 
     public function viewCoachAndPlans(Request $request){
-        $coach = coach::query()->where('coach_id',$request->coach_id)->get(['coach_id','FirstName','LastName','gender','rating','programs','image','description','phone','email']);
-        $plans = program::query()->where('coach_id',$request->coach_id)->get();
-        $coach['plans'] = $plans;
+        $coach['details'] = coach::query()->where('coach_id',$request->coach_id)->first(['coach_id','FirstName','LastName','gender','rating','programs','image','description','phone','email']);
+        $coach['plans'] = program::query()->where('coach_id',$request->coach_id)->get();
         return response()->json($coach);
     }
 }
