@@ -258,26 +258,25 @@ class userController extends Controller
             $old_steps = $stored_steps->steps;
             $new_steps = $request->steps;
             $user->steps = $old_steps + $new_steps;
+            $user->step_update = date('y-m-d');
             return response()->json(['message'=>$user->save()]);
         }
         else{
             return response()->json(['message'=>'Only One Request Per Day']);
         }
-
-
     }
 
     public function resetSteps(){
         $user = Auth::user();
         $steps = user::query()->where('user_id', $user->user_id)->first();
         $steps->steps = 0;
+        $steps->step_update = date('y-m-d');
         return response()->json(['message'=>$steps->save()]);
     }
 
     public function viewSteps(){
         $user = Auth::user();
-        $steps = user::query()->where('user_id', $user->user_id)->first();
-        return response()->json(['total steps'=>$steps->steps]);
+        return response()->json(['total steps'=>$user->steps]);
     }
 
 }
