@@ -32,5 +32,5 @@ Route::group( ['prefix' => 'user','middleware' => ['auth:user-api','scopes:user'
     Route::get('viewsleep', 'userController@viewSleep');
     Route::post('searchcoach', 'userController@searchCoach');
     Route::get('discover', 'userController@discoverCoaches');
-    Route::get('viewcoachdetailsandplans', 'userController@viewCoachAndPlans');
+    Route::post('viewcoachdetailsandplans', 'userController@viewCoachAndPlans');
 });
