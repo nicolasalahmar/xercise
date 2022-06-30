@@ -322,4 +322,9 @@ class userController extends Controller
         $result = DB::table('sleep_trackers')->where('user_id',$user->user_id)->delete();
         return response()->json(['message'=>(boolean)$result]);
     }
+
+    public function searchCoach(Request $request){
+        $coach = coach::query()->where('FirstName'.' '.'LastName','like',$request->search.'%')->take(10)->get();
+        return $coach;
+    }
 }
