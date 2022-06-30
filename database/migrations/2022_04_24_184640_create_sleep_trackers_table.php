@@ -16,11 +16,12 @@ return new class extends Migration
         Schema::create('sleep_trackers', function (Blueprint $table) {
             $table->float('hours');
             $table->date('date')->unique();
-        });
 
-        Schema::table('sleep_trackers',function(Blueprint $table){
-        	$table->unsignedBigInteger('user_id');
+
+            $table->unsignedBigInteger('user_id');
         	$table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
+
+            $table->primary(['date','user_id']);
         });
     }
 
