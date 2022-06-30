@@ -24,6 +24,7 @@ return new class extends Migration
 
             $table->integer('reps');
             $table->time('duration');
+            $table->enum('day_num', ['1','2','3','4','5','6','7']);
         });
     }
 

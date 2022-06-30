@@ -296,9 +296,16 @@ class userController extends Controller
     public function calculateSleep(Request $request){
         $user = Auth::user();
 
-        $last_date = DB::table('sleep_trackers')->where('user_id',$user->user_id)->orderBy('date','DESC')->first()->date;
-        $last_date = Carbon::parse($last_date)->format('y-m-d');
+        $last_date = DB::table('sleep_trackers')->where('user_id',$user->user_id)->orderBy('date','DESC')->first();
 
+        if($last_date == null){
+            $result = DB::table('sleep_trackers')->insert(['hours'=>$request->hours,'date'=>date('y-m-d'),'user_id'=>$user->user_id]);
+            return response()->json(['message'=>$result]);
+        }
+        else{
+            $last_date = $last_date->date;
+        }
+        $last_date = Carbon::parse($last_date)->format('y-m-d');
         $request_date = Carbon::now()->format('y-m-d');
 
         if($request_date > $last_date){
