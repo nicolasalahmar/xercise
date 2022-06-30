@@ -24,4 +24,10 @@ Route::group( ['prefix' => 'user','middleware' => ['auth:user-api','scopes:user'
     Route::get('viewcoachdashboard','userController@viewCoachDashboard');
     Route::post('enroll','userController@enroll');
     Route::get('resetallprogress','userController@resetAllProgress');
+    Route::post('calculatesteps', 'userController@calculateSteps');
+    Route::post('resetsteps', 'userController@resetSteps');
+    Route::get('viewsteps', 'userController@viewSteps');
+    Route::post('calculatesleep', 'userController@calculateSleep');
+    Route::post('resetsleep', 'userController@resetSleep');
+    Route::get('viewsleep', 'userController@viewSleep');
 });

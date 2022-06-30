@@ -279,4 +279,40 @@ class userController extends Controller
         return response()->json(['total steps'=>$user->steps]);
     }
 
+    public function viewSleep(){
+        $user = Auth::user();
+        $week = array();
+        $week[0] = DB::table('sleep_trackers')->where('user_id',$user->user_id)->where('date',Carbon::now()->subDays(6)->format('y-m-d'))->first();
+        $week[1] = DB::table('sleep_trackers')->where('user_id',$user->user_id)->where('date',Carbon::now()->subDays(5)->format('y-m-d'))->first();
+        $week[2] = DB::table('sleep_trackers')->where('user_id',$user->user_id)->where('date',Carbon::now()->subDays(4)->format('y-m-d'))->first();
+        $week[3] = DB::table('sleep_trackers')->where('user_id',$user->user_id)->where('date',Carbon::now()->subDays(3)->format('y-m-d'))->first();
+        $week[4] = DB::table('sleep_trackers')->where('user_id',$user->user_id)->where('date',Carbon::now()->subDays(2)->format('y-m-d'))->first();
+        $week[5] = DB::table('sleep_trackers')->where('user_id',$user->user_id)->where('date',Carbon::now()->subDays(1)->format('y-m-d'))->first();
+        $week[6] = DB::table('sleep_trackers')->where('user_id',$user->user_id)->where('date',Carbon::now()->format('y-m-d'))->first();
+
+        return response()->json(['graph data'=>$week]);
+    }
+
+    public function calculateSleep(Request $request){
+        $user = Auth::user();
+
+        $last_date = DB::table('sleep_trackers')->where('user_id',$user->user_id)->orderBy('date','DESC')->first()->date;
+        $last_date = Carbon::parse($last_date)->format('y-m-d');
+
+        $request_date = Carbon::now()->format('y-m-d');
+
+        if($request_date > $last_date){
+            $result = DB::table('sleep_trackers')->insert(['hours'=>$request->hours,'date'=>date('y-m-d'),'user_id'=>$user->user_id]);
+            return response()->json(['message'=>$result]);
+        }
+        else{
+            return response()->json(['message'=>'Only One Request Per Day']);
+        }
+    }
+
+    public function resetSleep(){
+        $user = Auth::user();
+        $result = DB::table('sleep_trackers')->where('user_id',$user->user_id)->delete();
+        return response()->json(['message'=>(boolean)$result]);
+    }
 }
