@@ -304,11 +304,8 @@ class userController extends Controller
         $user = Auth::user();
         if($request->has('program_id')){
             $req = enroll::query()->where('user_id', $user->user_id)->where('program_id',$request->program_id)->delete();
-            return response()->json( ['success'=>$req]);
+            return response()->json( ['success'=>(boolean)$req]);
         }
     }
 
 }
-
-
-//---------------------------------
