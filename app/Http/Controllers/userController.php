@@ -312,6 +312,19 @@ class userController extends Controller
         }
     }
 
+
+    public function viewCustomPlans(){
+        $user = Auth::user();
+        $plans = private_program::query()->where('user_id', $user->user_id)->where('coach_id', NULL)->get('private_program_id');
+        $arr = array();
+
+        foreach($plans as $plan){
+            $temp = private_program::where('private_program_id', $plan['private_program_id'])->first();
+            //time per day and times a week must be added to programs table
+            array_push($arr,$temp);
+        }
+        return response()->json($arr);
+    }
 }
 
 
