@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\coach;
 use App\Models\user;
 use App\Models\requests;
+use App\Models\program;
 use Auth;
 use Storage;
 use DB;
@@ -115,4 +116,26 @@ class coachController extends Controller
         return response()->json( $coaches);
     }
 
+//to remove a plan published by coach (gets removed from users account as well)
+    public function deletePlan(Request $request){
+        $coach = Auth::user();
+        if($request->has('program_id')){
+            $req = program::query()->where('program_id', $request->program_id)->where('coach_id',$coach->coach_id)->delete();
+            return response()->json( ['success'=>$req]);
+        }
+    }
+
+
+    public function viewPlans(){
+        $coach = Auth::user();
+        $plans = program::query()->where('coach_id', $coach->coach_id)->get('program_id');
+        $arr = array();
+
+        foreach($plans as $plan){
+            $temp = program::where('program_id', $plan['program_id'])->first();
+            //time per day and times a week must be added to programs table
+            array_push($arr,$temp);
+        }
+        return response()->json($arr);
+    }
 }
