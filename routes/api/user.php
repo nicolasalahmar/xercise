@@ -25,12 +25,5 @@ Route::group( ['prefix' => 'user','middleware' => ['auth:user-api','scopes:user'
     Route::get('deleterequest','userController@deleteRequest');
     Route::get('viewuserdashboard','userController@viewUserDashboard');
     Route::get('viewcoachdashboard','userController@viewCoachDashboard');
-    Route::get('viewuserplans','userController@viewUserPlans');
-    Route::get('returnactiveplan','userController@viewActivePlan');
-    Route::post('activateplan','userController@activatePlan');
     Route::post('enroll','userController@enroll');
-    Route::post('resetplanprogress','userController@resetPlanProgress');
-    Route::post('deleteuserplan','userController@deletePlan');
-    Route::get('viewcustomplans','userController@viewCustomPlans');
-
 });
