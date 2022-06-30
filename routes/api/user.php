@@ -30,7 +30,7 @@ Route::group( ['prefix' => 'user','middleware' => ['auth:user-api','scopes:user'
     Route::post('calculatesleep', 'userController@calculateSleep');
     Route::post('resetsleep', 'userController@resetSleep');
     Route::get('viewsleep', 'userController@viewSleep');
-    Route::post('searchcoach', 'userController@searchCoach');
+    Route::post('search', 'userController@search');
     Route::get('discover', 'userController@discoverCoaches');
     Route::post('viewcoachdetailsandplans', 'userController@viewCoachAndPlans');
 });

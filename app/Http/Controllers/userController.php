@@ -323,9 +323,21 @@ class userController extends Controller
         return response()->json(['message'=>(boolean)$result]);
     }
 
-    public function searchCoach(Request $request){
-        $coach = coach::query()->where('FirstName'.' '.'LastName','like',$request->search.'%')->take(10)->get();
+    public function searchCoach($search){
+        $coach = DB::select('select coach_id,FirstName,LastName,rating,programs from coaches where CONCAT(FirstName ," ",LastName) like "%'.$search.'%" limit 10');
         return $coach;
+    }
+
+    public function searchPlan($search){
+        $plans = DB::select('select * from programs where name like "%'.$search.'%" limit 10');
+        return $plans;
+    }
+
+    public function search(Request $request){
+        $search = $request->search;
+        $coach = $this->searchCoach($search);
+        $plans = $this->searchPlan($search);
+        return response()->json(['coaches'=>$coach,'plans'=>$plans]);
     }
 
     public function discoverCoaches(){
