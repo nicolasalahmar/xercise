@@ -335,6 +335,8 @@ class userController extends Controller
 
     public function viewCoachAndPlans(Request $request){
         $coach = coach::query()->where('coach_id',$request->coach_id)->get(['coach_id','FirstName','LastName','gender','rating','programs','image','description','phone','email']);
+        $plans = program::query()->where('coach_id',$request->coach_id)->get();
+        $coach['plans'] = $plans;
         return response()->json($coach);
     }
 }
