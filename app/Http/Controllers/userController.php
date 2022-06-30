@@ -14,6 +14,7 @@ use App\Models\enroll;
 use App\Models\private_enroll;
 use App\Models\program;
 use App\Models\private_program;
+use App\Models\sleep_tracker;
 
 use Auth;
 use Storage;
@@ -135,10 +136,6 @@ class userController extends Controller
         return response()->json(["success"=>true, "message"=>"Rated coach successfuly."]);
     }
 
-
-
-
-
     public function viewUserDashboard(){
         $users = user::query()->orderBy('duration','DESC')->limit(100)->get(['username','duration','image']);
         return response()->json($users);
@@ -157,6 +154,23 @@ class userController extends Controller
         $enroll->done = false;
 
         return response()->json(['message'=>$enroll->save()]);
+    }
+
+    public function resetAllProgress(){
+        $user_id = Auth::user()->user_id;
+        //delete all past exercising sessions
+        workout_stats::query()->where('user_id',$user_id)->delete();
+
+        //delete all sleep data
+        sleep_tracker::query()->where('user_id',$user_id)->delete();
+
+        //delete all steps taken
+        $user = user::query()->where('user_id',$user_id)->first();
+        $user->steps = 0;
+        $user->step_update = date('d.m.Y');
+        $user->save();
+
+        return response()->json(['message'=>'deleted successfully']);
     }
 
     /*public function viewActivePlan(Request $request){   //for the homescreen

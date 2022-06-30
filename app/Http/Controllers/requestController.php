@@ -37,7 +37,7 @@ class requestController extends Controller
 
     public function showCurrentRequests(){
         $user = Auth::user(); //returns token's owner (user who owns the token)
-        $req = requests::query()->where('user_id',$user->user_id)->get(['name','status','created_at','coach_id']);
+        $req = requests::query()->where('user_id',$user->user_id)->get(['request_id','name','status','created_at','coach_id']);
 
         foreach($req as $r){
             $coach_firstname = coach::query()->where('coach_id',$r->coach_id)->first('FirstName');

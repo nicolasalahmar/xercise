@@ -23,4 +23,5 @@ Route::group( ['prefix' => 'user','middleware' => ['auth:user-api','scopes:user'
     Route::get('viewuserdashboard','userController@viewUserDashboard');
     Route::get('viewcoachdashboard','userController@viewCoachDashboard');
     Route::post('enroll','userController@enroll');
+    Route::get('resetallprogress','userController@resetAllProgress');
 });
