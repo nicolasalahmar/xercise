@@ -167,7 +167,7 @@ class userController extends Controller
         //delete all steps taken
         $user = user::query()->where('user_id',$user_id)->first();
         $user->steps = 0;
-        $user->step_update = date('d.m.Y');
+        $user->step_update = date('Y-m-d');
         $user->save();
 
         return response()->json(['message'=>'deleted successfully']);
