@@ -173,6 +173,36 @@ class userController extends Controller
         return response()->json(['message'=>'deleted successfully']);
     }
 
+    //step counter functions
+    public function calculateSteps(Request $request){
+        $user = Auth::user();
+        $last_date = Carbon::parse($user->step_update)->format('y-m-d');
+        $request_date = Carbon::now()->format('y-m-d');
+        if($request_date > $last_date){
+            $stored_steps = user::query()->where('user_id', $user->user_id)->first('steps');
+            $old_steps = $stored_steps->steps;
+            $new_steps = $request->steps;
+            $user->steps = $old_steps + $new_steps;
+            return response()->json(['message'=>$user->save()]);
+        }
+        else{
+            return response()->json(['message'=>'Only One Request Per Day']);
+        }
+    }
+
+    public function resetSteps(){
+        $user = Auth::user();
+        $steps = user::query()->where('user_id', $user->user_id)->first();
+        $steps->steps = 0;
+        $steps->step_update = date('y-m-d');
+        return response()->json(['message'=>$steps->save()]);
+    }
+
+    public function viewSteps(){
+        $user = Auth::user();
+        return response()->json(['total steps'=>$user->steps]);
+    }
+
     /*public function viewActivePlan(Request $request){   //for the homescreen
         $user = Auth::user();
         if($user->active_program_id == null){

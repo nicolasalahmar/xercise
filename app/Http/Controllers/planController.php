@@ -62,12 +62,13 @@ class planController extends Controller
         $arr = array();
 
         foreach($plans as $plan){
-            $temp = private_program::where('private_program_id', $plan['private_program_id'])->first();
+            $temp = private_program::query()->where('private_program_id', $plan['private_program_id'])->first();
             //time per day and times a week must be added to programs table
             array_push($arr,$temp);
         }
         return response()->json($arr);
     }
+
     public function resetPlanProgress(Request $request){
         $user = Auth::user();
         if($request->has('program_id')){
