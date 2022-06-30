@@ -173,36 +173,6 @@ class userController extends Controller
         return response()->json(['message'=>'deleted successfully']);
     }
 
-    //step counter functions
-    public function calculateSteps(Request $request){
-        $user = Auth::user();
-        $last_date = Carbon::parse($user->step_update)->format('y-m-d');
-        $request_date = Carbon::now()->format('y-m-d');
-        if($request_date > $last_date){
-            $stored_steps = user::query()->where('user_id', $user->user_id)->first('steps');
-            $old_steps = $stored_steps->steps;
-            $new_steps = $request->steps;
-            $user->steps = $old_steps + $new_steps;
-            return response()->json(['message'=>$user->save()]);
-        }
-        else{
-            return response()->json(['message'=>'Only One Request Per Day']);
-        }
-    }
-
-    public function resetSteps(){
-        $user = Auth::user();
-        $steps = user::query()->where('user_id', $user->user_id)->first();
-        $steps->steps = 0;
-        $steps->step_update = date('y-m-d');
-        return response()->json(['message'=>$steps->save()]);
-    }
-
-    public function viewSteps(){
-        $user = Auth::user();
-        return response()->json(['total steps'=>$user->steps]);
-    }
-
     /*public function viewActivePlan(Request $request){   //for the homescreen
         $user = Auth::user();
         if($user->active_program_id == null){
@@ -230,4 +200,84 @@ class userController extends Controller
             return response()->json(['success'=>true, 'message'=>'Active plan', 'active_plan'=>$active_program]);
         }
     }*/
+
+
+    public function activatePlan(Request $request){
+        $user = Auth::user();
+        if($request->has('program_id')){
+            $user->active_program_id = $request->program_id;
+            $user->active_private_program_id= null;
+            $user->save();
+            return response()->json(['success' => true,'message' => 'program activated.']);
+        }
+        else if($request->has('private_program_id')){
+            $user->active_program_id = null;
+            $user->active_private_program_id = $request->private_program_id;
+            $user->save();
+            return response()->json(['success' => true,'message' => 'private program activated.']);
+        }
+        else {
+            return response()->json(['success' => false,'message' => 'No program id provided'], 400);
+        }
+    }
+
+//to remove a plan from my plans in user
+    public function deletePlan(Request $request){
+        $user = Auth::user();
+        if($request->has('program_id')){
+            $req = enroll::query()->where('user_id', $user->user_id)->where('program_id',$request->program_id)->delete();
+            return response()->json( ['success'=>$req]);
+        }
+        if($request->has('private_program_id')){
+            $req = private_enroll::query()->where('user_id', $user->user_id)->where('private_program_id',$request->private_program_id)->delete();
+            return response()->json( ['success'=>$req]);
+        }
+    }
+
+
+    public function viewCustomPlans(){
+        $user = Auth::user();
+        $plans = private_program::query()->where('user_id', $user->user_id)->where('coach_id', NULL)->get('private_program_id');
+        $arr = array();
+
+        foreach($plans as $plan){
+            $temp = private_program::query()->where('private_program_id', $plan['private_program_id'])->first();
+            //time per day and times a week must be added to programs table
+            array_push($arr,$temp);
+        }
+        return response()->json($arr);
+    }
+
+    //step counter functions
+    public function calculateSteps(Request $request){
+        $user = Auth::user();
+        $last_date = Carbon::parse($user->step_update)->format('y-m-d');
+        $request_date = Carbon::now()->format('y-m-d');
+        if($request_date > $last_date){
+            $stored_steps = user::query()->where('user_id', $user->user_id)->first('steps');
+            $old_steps = $stored_steps->steps;
+            $new_steps = $request->steps;
+            $user->steps = $old_steps + $new_steps;
+            return response()->json(['message'=>$user->save()]);
+        }
+        else{
+            return response()->json(['message'=>'Only One Request Per Day']);
+        }
+
+
+    }
+
+    public function resetSteps(){
+        $user = Auth::user();
+        $steps = user::query()->where('user_id', $user->user_id)->first();
+        $steps->steps = 0;
+        return response()->json(['message'=>$steps->save()]);
+    }
+
+    public function viewSteps(){
+        $user = Auth::user();
+        $steps = user::query()->where('user_id', $user->user_id)->first();
+        return response()->json(['total steps'=>$steps->steps]);
+    }
+
 }
