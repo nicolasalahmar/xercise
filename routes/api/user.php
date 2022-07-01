@@ -19,7 +19,7 @@ Route::group( ['prefix' => 'user','middleware' => ['auth:user-api','scopes:user'
     Route::get('showprofile','userController@showUserProfile');
     Route::get('deleteaccount','userController@deleteUserAccount');
     Route::post('editprofile','userController@editUserProfile');
-    Route::post('ratecoach/{coach_id}','userController@rateCoach');
+    Route::post('ratecoach','userController@rateCoach');
     Route::get('viewuserdashboard','userController@viewUserDashboard');
     Route::get('viewcoachdashboard','userController@viewCoachDashboard');
     Route::post('enroll','userController@enroll');
@@ -30,9 +30,9 @@ Route::group( ['prefix' => 'user','middleware' => ['auth:user-api','scopes:user'
     Route::post('calculatesleep', 'userController@calculateSleep');
     Route::post('resetsleep', 'userController@resetSleep');
     Route::get('viewsleep', 'userController@viewSleep');
-    Route::post('searchcoach', 'userController@searchCoach');
+    Route::post('search', 'userController@search');
     Route::get('discover', 'userController@discoverCoaches');
     Route::post('viewcoachdetailsandplans', 'userController@viewCoachAndPlans');
     Route::post('createrequest', 'userController@requestPlan');
-
+    Route::post('rateplan', 'userController@ratePlan');
 });

@@ -99,11 +99,13 @@ class userController extends Controller
 
     }
 
-    public function rateCoach(Request $request, $coach_id){
+    public function rateCoach(Request $request){
         $user = Auth::user();
+        $coach_id = $request->coach_id;
 
         $validator = Validator::make($request->all(),[
             'rating'=>['required','in:1,2,3,4,5'],
+            'coach_id'=>['required','exists:coaches,coach_id'],
         ]);
 
         if($validator->fails()){
@@ -134,6 +136,27 @@ class userController extends Controller
         coach::query()->where('coach_id',$coach_id)->update(['rating'=>$avg]);
 
         return response()->json(["success"=>true, "message"=>"Rated coach successfuly."]);
+    }
+
+    public function ratePlan(Request $request){
+        $user = Auth::user();
+        $validator = Validator::make($request->all(),[
+            'rating'=>['required','in:1,2,3,4,5'],
+            'program_id'=>['required','exists:programs,program_id'],
+        ]);
+        if($validator->fails()){
+            return $validator->errors()->all();
+        }
+
+        $rating = $request->rating;
+        $plan_id = $request->program_id;
+
+        if (DB::table('rating_programs')->where('user_id',$user->user_id)->where('program_id',$plan_id)->exists()){
+            return response()->json(['message'=>(boolean)DB::table('rating_programs')->where('user_id',$user->user_id)->where('program_id',$plan_id)->update(['rating'=>$request->rating])]);
+        }
+        else{
+            return response()->json(['message'=>DB::table('rating_programs')->insert(['user_id'=>$user->user_id,'program_id'=>$plan_id,'rating'=>$rating])]);
+        }
     }
 
     public function viewUserDashboard(){
@@ -323,9 +346,21 @@ class userController extends Controller
         return response()->json(['message'=>(boolean)$result]);
     }
 
-    public function searchCoach(Request $request){
-        $coach = coach::query()->where('FirstName'.' '.'LastName','like',$request->search.'%')->take(10)->get();
+    public function searchCoach($search){
+        $coach = DB::select('select coach_id,FirstName,LastName,rating,programs from coaches where CONCAT(FirstName ," ",LastName) like "%'.$search.'%" limit 10');
         return $coach;
+    }
+
+    public function searchPlan($search){
+        $plans = DB::select('select * from programs where name like "%'.$search.'%" limit 10');
+        return $plans;
+    }
+
+    public function search(Request $request){
+        $search = $request->search;
+        $coach = $this->searchCoach($search);
+        $plans = $this->searchPlan($search);
+        return response()->json(['coaches'=>$coach,'plans'=>$plans]);
     }
 
     public function discoverCoaches(){
