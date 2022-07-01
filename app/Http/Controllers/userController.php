@@ -196,35 +196,6 @@ class userController extends Controller
         return response()->json(['message'=>'deleted successfully']);
     }
 
-    /*public function viewActivePlan(Request $request){   //for the homescreen
-        $user = Auth::user();
-        if($user->active_program_id == null){
-            if($user->active_private_program_id == null){
-                return response()->json(['success'=>false, 'message'=>'No active plan']);
-            }
-            else{
-                $active_private_program = private_program::query()->where('private_program_id',$user->active_private_program_id)->first();
-                $active_private_program['type'] = 'private';
-                return $stats = workout_stats::query()->where('private_program_id',$user->active_private_program_id)->orderBy('dateTime','ASC')->get();//if the user plays the same plan twice the progress will overlap
-                foreach($stats as $stat){
-                    $stat['percentage'] = $stat['duration']/$active_private_program['duration'];
-                    unset($stat['dateTime']);
-                    unset($stat['workout_stats_id']);
-                }
-                $active_private_program['stats']=$stats;                    //
-                $active_private_program['author'] = coach::query()->where('coach_id',$active_private_program['coach_id'])->first('firstName')['firstName'].' '.coach::query()->where('coach_id',$active_private_program['coach_id'])->first('lastName')['lastName'];
-                return response()->json(['success'=>true, 'message'=>'Active plan', 'active_plan'=>$active_private_program]);
-            }
-        }
-        else{
-            $active_program = program::query()->where('program_id',$user->active_program_id)->first();
-            $active_program['type'] = 'public';
-            $active_program['author'] = coach::query()->where('coach_id',$active_program['coach_id'])->first('firstName')['firstName'].' '.coach::query()->where('coach_id',$active_program['coach_id'])->first('lastName')['lastName'];
-            return response()->json(['success'=>true, 'message'=>'Active plan', 'active_plan'=>$active_program]);
-        }
-    }*/
-
-
     public function activatePlan(Request $request){
         $user = Auth::user();
         if($request->has('program_id')){

@@ -114,8 +114,8 @@ class requestController extends Controller
         $coach = Auth::user(); //returns token's owner (user who owns the token)
         $id = request()->query('request_id');
         $req = requests::query()->where('request_id',$id)->where('coach_id',$coach->coach_id)->first();
-        $user_username = user::query()->where('user_id',$req->user_id)->first('username');
-        $req['user_username'] = $user_username['username'];
+        $user = user::query()->where('user_id',$req->user_id)->first();
+        $req['user'] = $user;
         return response()->json($req);
     }
 
