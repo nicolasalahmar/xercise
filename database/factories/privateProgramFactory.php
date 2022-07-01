@@ -28,6 +28,7 @@ class privateProgramFactory extends Factory
             'coach_id'=>coach::factory()->create()->coach_id,
             'duration'=>$this->faker->dateTimeBetween('00:20:00', '00:50:00'),
             'user_id'=>user::factory()->create()->user_id,
+            'Kcal'=>$this->faker->numberBetween(2,5),
         ];
     }
 }

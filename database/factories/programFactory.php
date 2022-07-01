@@ -24,6 +24,7 @@ class programFactory extends Factory
             'knee'=>$this->faker->randomElement(['Yes'  , 'No','A Little']),
             'duration'=>$this->faker->dateTimeBetween('00:20:00', '00:50:00'),
             'category'=>$this->faker->randomElement(['muscle','weight','height','stretching']),
+            'Kcal'=>$this->faker->numberBetween(2,5),
         ];
     }
 }
