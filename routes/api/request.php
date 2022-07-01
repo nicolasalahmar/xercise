@@ -19,5 +19,5 @@ Route::group( ['prefix' => 'user','middleware' => ['auth:user-api','scopes:user'
     Route::get('viewrequest','requestController@viewRequest');
     Route::get('showcurrentrequests','requestController@showCurrentRequests');
     Route::get('deleterequest','requestController@deleteRequest');
-  //  Route::post('createrequest', 'requestController@requestPlan');
+    Route::post('createrequest', 'requestController@requestPlan');
 });
