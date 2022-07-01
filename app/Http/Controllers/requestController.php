@@ -58,6 +58,20 @@ class requestController extends Controller
     public function requestPlan(Request $request){
         $user = Auth::user();
 
+        $validator = Validator::make($request->all(),[
+            'coach_id'=>['required','exists:coaches,coach_id'],
+            'name'=>['required','min:3','regex:/^[a-zA-Z ]+$/'],
+    		'objective'=>['required','min:3','regex:/^[a-zA-Z ]+$/'],
+            'message'=>['min:0'],
+            'days'=>['required','in:1,2,3,4,5'],
+            'time_per_day'=>['required','in:10,15,20,25,30,35,40'],
+
+    	]);
+
+    	if($validator->fails()){
+    		return $validator->errors()->all();
+    	}
+
         $req = new requests();
         $req->user_id = $user->user_id;
         $req->coach_id = $request->coach_id;
@@ -68,6 +82,11 @@ class requestController extends Controller
         $req->message = $request->message;
         $req->status = 'pending';
 
-        return response()->json(['success'=>$req->save()]);
+        if($req->save()){
+            return response()->json(["success"=>true, "message"=>"Request Has Been Sent Successfully"]);
+        }
+        else {
+            return response()->json(["success"=>false, "message"=>"Error Sending Request"]);
+        }
     }
 }
