@@ -33,4 +33,6 @@ Route::group( ['prefix' => 'user','middleware' => ['auth:user-api','scopes:user'
     Route::post('searchcoach', 'userController@searchCoach');
     Route::get('discover', 'userController@discoverCoaches');
     Route::post('viewcoachdetailsandplans', 'userController@viewCoachAndPlans');
+    Route::post('createrequest', 'userController@requestPlan');
+
 });

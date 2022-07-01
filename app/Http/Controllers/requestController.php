@@ -54,4 +54,6 @@ class requestController extends Controller
         $req = requests::query()->where('request_id',$id)->first();
         return response()->json( ['success'=>$req->delete()]);
     }
+
+
 }

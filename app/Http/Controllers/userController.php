@@ -338,4 +338,21 @@ class userController extends Controller
         $coach['plans'] = program::query()->where('coach_id',$request->coach_id)->get();
         return response()->json($coach);
     }
+
+
+    public function requestPlan(Request $request){
+        $user = Auth::user();
+
+        $req = new requests();
+        $req->user_id = $user->user_id;
+        $req->coach_id = $request->coach_id;
+        $req->name = $request->name;
+        $req->time_per_day = $request->time_per_day;
+        $req->days = $request->days;
+        $req->objective = $request->objective;
+        $req->message = $request->message;
+        $req->status = 'pending';
+
+        return response()->json(['success'=>$req->save()]);
+    }
 }
