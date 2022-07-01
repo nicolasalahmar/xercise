@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('name');
             $table->longtext('description');
             $table->time('duration');
+            $table->float('Kcal');
             $table->timestamps();
         });
 

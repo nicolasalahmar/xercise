@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('name');
             $table->longtext('description');
             $table->float('rating')->default(0);
+            $table->float('Kcal');
             $table->enum('knee',['Yes','No','A little']);
             $table->time('duration');
             $table->enum('category',['muscle','weight','height','stretching']);

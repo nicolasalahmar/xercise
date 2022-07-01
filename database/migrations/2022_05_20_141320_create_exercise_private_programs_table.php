@@ -22,8 +22,8 @@ return new class extends Migration
 
             $table->primary(['ex_id','private_program_id']);
 
-            $table->integer('reps');
-            $table->time('duration');
+            $table->integer('reps')->nullable();
+            $table->time('duration')->nullable();
             $table->enum('day_num', ['1','2','3','4','5','6','7']);
         });
     }
