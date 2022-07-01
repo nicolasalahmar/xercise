@@ -24,9 +24,13 @@ use Carbon\Carbon;
 
 class requestController extends Controller
 {
-    public function viewRequest(){  //in request details in frontend add coach name/time of creation/delete status
+    //=================================================================================================================
+    //=========================================user functions==========================================================
+    //=================================================================================================================
+
+    public function viewRequestUser(){  //user function
         $user = Auth::user(); //returns token's owner (user who owns the token)
-        $id = request()->query('request_id');
+        $id = request()->query('request_id');   //in request details in frontend add coach name/time of creation/delete status
         $req = requests::query()->where('request_id',$id)->first(); //delete second where
         $coach_firstname = coach::query()->where('coach_id',$req->coach_id)->first('FirstName');
         $coach_lastname = coach::query()->where('coach_id',$req->coach_id)->first('LastName');
@@ -35,7 +39,7 @@ class requestController extends Controller
         return response()->json($req);
     }
 
-    public function showCurrentRequests(){
+    public function showCurrentRequestsUser(){  //user function
         $user = Auth::user(); //returns token's owner (user who owns the token)
         $req = requests::query()->where('user_id',$user->user_id)->get(['request_id','name','status','created_at','coach_id']);
 
@@ -48,14 +52,14 @@ class requestController extends Controller
         return response()->json($req);
     }
 
-    public function deleteRequest(){
+    public function deleteRequest(){    //user function
         $user = Auth::user();
         $id = request()->query('request_id');
         $req = requests::query()->where('request_id',$id)->first();
         return response()->json( ['success'=>$req->delete()]);
     }
 
-    public function requestPlan(Request $request){
+    public function requestPlan(Request $request){  //user function
         $user = Auth::user();
 
         $validator = Validator::make($request->all(),[
@@ -88,5 +92,41 @@ class requestController extends Controller
         else {
             return response()->json(["success"=>false, "message"=>"Error Sending Request"]);
         }
+    }
+
+
+
+
+    //=================================================================================================================
+    //=========================================coach functions=========================================================
+    //=================================================================================================================
+
+
+    public function declineRequest(){   //coach function
+        $coach = Auth::user();
+        $id = request()->query('request_id');
+        $req = requests::query()->where('request_id',$id)->where('coach_id',$coach->coach_id)->first();
+        return response()->json( ['success'=>$req->update(['status'=>'rejected'])]);
+        //delete request from coaches menu when he declines it (remind frontend to do this)
+    }
+
+    public function viewRequestCoach(){  //coach function
+        $coach = Auth::user(); //returns token's owner (user who owns the token)
+        $id = request()->query('request_id');
+        $req = requests::query()->where('request_id',$id)->where('coach_id',$coach->coach_id)->first();
+        $user_username = user::query()->where('user_id',$req->user_id)->first('username');
+        $req['user_username'] = $user_username['username'];
+        return response()->json($req);
+    }
+
+    public function showCurrentRequestsCoach(){  //coach function
+        $coach = Auth::user(); //returns token's owner (user who owns the token)
+        $req = requests::query()->where('coach_id',$coach->coach_id)->where('status','pending')->get(['name','objective','created_at','user_id']);
+
+        foreach($req as $r){
+            $user_username = user::query()->where('user_id',$r->user_id)->first('username');
+            $r['user_username'] = $user_username['username'];
+        }
+        return response()->json($req);
     }
 }
