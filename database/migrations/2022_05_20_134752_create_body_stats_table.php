@@ -18,11 +18,9 @@ return new class extends Migration
             $table->float('weight');
             $table->integer('height');
             $table->dateTime('dateTime');
-        });
-
-        Schema::table('body_stats',function(Blueprint $table){
             $table->unsignedBigInteger('user_id');
         	$table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
+            $table->timestamps();
         });
     }
 

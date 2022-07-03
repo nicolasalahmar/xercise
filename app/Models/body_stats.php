@@ -15,8 +15,9 @@ class body_stats extends Model
         'user_id',
         'weight',
         'height',
-        'dateTime',
     ];
+
+    public $timestamps = true;
 
     use HasFactory;
 }
