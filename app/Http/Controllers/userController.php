@@ -455,8 +455,6 @@ class userController extends Controller
             $stats['duration'] = $hours * 60 + (int)$minutes;
              
             //---------------------------------------------
-            $stats['BMI'] = 0;
-
             return response()->json($stats);
         }
     }
