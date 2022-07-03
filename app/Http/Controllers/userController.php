@@ -388,4 +388,75 @@ class userController extends Controller
         }
     }
 
+    //statistics
+
+    public function workoutStats(){
+        $user = Auth::user();
+
+        if($user->active_program_id != NULL){
+
+            $dates = workout_stats::query()->where('user_id', $user->user_id)->where('program_id',$user->active_program_id)->pluck('created_at');
+            for($i=0;$i<count($dates);$i++){
+                $dates[$i] = $dates[$i]->format('y-m-d');
+            }
+
+            $stats['workout_dates'] = $dates;
+            $stats['workouts'] = count($dates);
+
+            $kcals = workout_stats::query()->where('user_id', $user->user_id)->where('program_id',$user->active_program_id)->pluck('kcal');
+            $stats['kcal'] = array_sum(json_decode($kcals,true));
+
+            $durations = workout_stats::query()->where('user_id', $user->user_id)->where('program_id',$user->active_program_id)->pluck('duration');
+            $dur =  json_decode($durations,true); // to convert collection into array
+            //helper function to calculate sum of durations and convert it into minutes
+            $sum = strtotime('00:00:00');
+            $sum2=0;  
+            foreach ($dur as $d){
+                $sum1=strtotime($d)-$sum;
+                $sum2 = $sum2+$sum1;
+            }
+            $sum3=$sum+$sum2;
+            $time = date("H:i:s",$sum3);
+            [$hours, $minutes] = explode(':', $time);
+
+            $stats['duration'] = $hours * 60 + (int)$minutes;
+            //---------------------------------------------
+            return response()->json($stats);
+        }
+
+        if($user->active_private_program_id != NULL){
+
+            $dates = workout_stats::query()->where('user_id', $user->user_id)->where('private_program_id',$user->active_private_program_id)->pluck('created_at');
+            for($i=0;$i<count($dates);$i++){
+                $dates[$i] = $dates[$i]->format('y-m-d');
+            }
+
+            $stats['workout_dates'] = $dates;
+            $stats['workouts'] = count($dates);
+
+            $kcals = workout_stats::query()->where('user_id', $user->user_id)->where('private_program_id',$user->active_private_program_id)->pluck('kcal');
+            $stats['kcal'] = array_sum(json_decode($kcals,true));
+
+            $durations = workout_stats::query()->where('user_id', $user->user_id)->where('private_program_id',$user->active_private_program_id)->pluck('duration');
+            $dur =  json_decode($durations,true); // to convert collection into array
+            //helper function to calculate sum of durations and convert it into minutes
+            $sum = strtotime('00:00:00');
+            $sum2=0;  
+            foreach ($dur as $d){
+                $sum1=strtotime($d)-$sum;
+                $sum2 = $sum2+$sum1;
+            }
+            $sum3=$sum+$sum2;
+            $time = date("H:i:s",$sum3);
+            [$hours, $minutes] = explode(':', $time);
+
+            $stats['duration'] = $hours * 60 + (int)$minutes;
+             
+            //---------------------------------------------
+            $stats['BMI'] = 0;
+
+            return response()->json($stats);
+        }
+    }
+
 }
