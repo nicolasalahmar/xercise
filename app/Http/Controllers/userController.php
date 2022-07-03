@@ -348,6 +348,49 @@ class userController extends Controller
         if($coach['rating'] != null){
             $coach['rating'] = $coach['rating']['rating'];
         }
-        return response()->json($coach);
+        return response()->json($coach);    
     }
+
+
+    public function addOtherDefaultPlan(Request $request){
+        $user = Auth::user();
+
+        $validator = Validator::make($request->all(),[
+            'name'=>['required','in:Muscle Fitness,Weight Loss,Height Increase,Stretching'],
+    	]);
+
+    	if($validator->fails()){
+    		return $validator->errors()->all();
+    	}
+
+        //default plans have program_id of 1 2 3 4
+        $default_enrolls = enroll::query()->where('user_id', $user->user_id)->whereIn('program_id',array(1,2,3,4))->pluck('program_id');
+
+        foreach($default_enrolls as $enroll){
+            $program_name = program::query()->where('program_id', $enroll)->pluck('name');
+            foreach($program_name as $progn){
+                if($request->name == $progn){
+                    return response()->json(["success"=>false, "message"=>"Default Plan Already Exists"]);
+                }
+            }
+
+        }
+
+        $en = new enroll();
+        $en->user_id = $user->user_id;
+        $program_id = program::query()->where('coach_id',NULL)->where('name', $request->name)->pluck('program_id');
+        foreach($program_id as $prog){
+        $en->program_id = $prog;
+        }
+        $en->done = 0;
+
+        if($en->save()){
+            return response()->json(["success"=>true, "message"=>"Default Plan Added Successfully"]);
+        }
+        else {
+            return response()->json(["success"=>false, "message"=>"Error Adding Default Plan"]);
+        }
+
+    }
+
 }
