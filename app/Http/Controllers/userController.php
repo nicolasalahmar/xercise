@@ -415,7 +415,7 @@ class userController extends Controller
     public function saveHeight(Request $request){
         $user = Auth::user();
         $validator = Validator::make($request->all(),[
-            'height'=>['required','numeric','min:100','gt:'.$user->height],
+            'height'=>['required','numeric','min:100','gt:'.$user->height_new],
             ]);
         if($validator->fails()){
             return $validator->errors()->all();
