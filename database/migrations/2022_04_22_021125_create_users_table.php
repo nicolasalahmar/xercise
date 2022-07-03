@@ -31,6 +31,7 @@ return new class extends Migration
             $table->enum('plank',['0-5','5-10','10-20','20-30','35+']);
             $table->enum('knee',['Yes','No','A little']);
             $table->float('height');
+            $table->float('height_new');
             $table->float('weight');
             $table->integer('steps')->default(0);
             $table->date('step_update')->default(date('Y-m-d'));

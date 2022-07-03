@@ -18,7 +18,7 @@ class UserFactory extends Factory
     public function definition()
     {
         $gender = $this->faker->randomElement(['male', 'female']);
-
+        $heights = $this->faker->numberBetween(120,200);
         return [
             'FirstName' => $this->faker->firstName($gender),
             'LastName' => $this->faker->lastName($gender),
@@ -35,7 +35,8 @@ class UserFactory extends Factory
             'pushups'=>$this->faker->randomElement(['0-5','5-10','10-20','20-30','35+']),
             'plank'=>$this->faker->randomElement(['0-5','5-10','10-20','20-30','35+']),
             'knee'=>$this->faker->randomElement(['Yes','No','A little']),
-            'height'=>$this->faker->numberBetween(120,200),
+            'height'=>$heights,
+            'height_new'=>$heights,
             'weight'=>$this->faker->numberBetween(50,100),
             'steps'=>$this->faker->numberBetween(1,20)
         ];

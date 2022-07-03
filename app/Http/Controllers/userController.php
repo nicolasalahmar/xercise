@@ -8,6 +8,7 @@ use App\Models\constants;
 use App\Models\user;
 use App\Models\coach;
 use App\Models\workout_stats;
+use App\Models\body_stats;
 use App\Models\rating_coach;
 use App\Models\requests;
 use App\Models\enroll;
@@ -79,6 +80,7 @@ class userController extends Controller
         $user->gender = $request->gender;
         $user->DOB = $request->DOB;
         $user->height = $request->height;
+        $user->height_new = $request->height;
         $user->weight = $request->weight;
         $user->week_start = $request->week_start;
         $user->times_a_week = $request->times_a_week;
@@ -459,4 +461,39 @@ class userController extends Controller
         }
     }
 
+    public function saveWeight(Request $request){
+        $user = Auth::user();
+        $validator = Validator::make($request->all(),[
+            'date'=>['required','date','before:'.Carbon::now()->format('y-m-d')],
+            'weight'=>['required','numeric','min:30'],
+            ]);
+        if($validator->fails()){
+            return $validator->errors()->all();
+        }
+        $date = $request->date;
+        $user_id = $user->user_id;
+        $temp = new body_stats();
+        $temp->user_id = $user_id;
+        $temp->weight = $weight;
+        $temp->date = $date;
+        if($temp->save()){
+            return response()->json(["success"=>true, "message"=>"Body Stats Saved Successfully"]);
+        }else {
+            return response()->json(["success"=>false, "message"=>"Error Saving Body Stats"]);
+        }
+    }
+
+    public function saveHeight(Request $request){
+        $user = Auth::user();
+        $validator = Validator::make($request->all(),[
+            'height'=>['required','numeric','min:100','gt:'.$user->height],
+            ]);
+        if($validator->fails()){
+            return $validator->errors()->all();
+        }
+        $height = $request->height;
+        $user->height_new = $height;
+
+        return response()->json(['success'=>$user->save()]);
+    }
 }

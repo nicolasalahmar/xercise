@@ -14,7 +14,7 @@ class body_stats extends Model
     protected $fillable = [
         'user_id',
         'weight',
-        'height',
+        'date',
     ];
 
     public $timestamps = true;

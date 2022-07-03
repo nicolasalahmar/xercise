@@ -16,8 +16,7 @@ return new class extends Migration
         Schema::create('body_stats', function (Blueprint $table) {
             $table->bigIncrements('body_stats_id');
             $table->float('weight');
-            $table->integer('height');
-            $table->dateTime('dateTime');
+            $table->date('date');
             $table->unsignedBigInteger('user_id');
         	$table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
             $table->timestamps();

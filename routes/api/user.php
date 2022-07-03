@@ -36,5 +36,6 @@ Route::group( ['prefix' => 'user','middleware' => ['auth:user-api','scopes:user'
     Route::post('rateplan', 'userController@ratePlan');
     Route::post('adddefaultplan', 'userController@addOtherDefaultPlan');
     Route::get('workoutstats', 'userController@workoutStats');
-
+    Route::post('saveweight', 'userController@saveWeight');
+    Route::post('saveheight', 'userController@saveHeight');
 });
