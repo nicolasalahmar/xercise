@@ -37,4 +37,5 @@ Route::group( ['prefix' => 'user','middleware' => ['auth:user-api','scopes:user'
     Route::post('adddefaultplan', 'userController@addOtherDefaultPlan');
     Route::post('saveweight', 'userController@saveWeight');
     Route::post('saveheight', 'userController@saveHeight');
+    Route::get('bodystats', 'userController@bodyStats');
 });

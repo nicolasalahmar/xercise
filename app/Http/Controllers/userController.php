@@ -403,13 +403,20 @@ class userController extends Controller
         $user_id = $user->user_id;
         $temp = new body_stats();
         $temp->user_id = $user_id;
-        $temp->weight = $weight;
+        $temp->weight = $request->weight;
         $temp->date = $date;
-        if($temp->save()){
-            return response()->json(["success"=>true, "message"=>"Body Stats Saved Successfully"]);
-        }else {
-            return response()->json(["success"=>false, "message"=>"Error Saving Body Stats"]);
+        if(body_stats::query()->where('date',$date)->where('user_id',$user_id)->exists()){
+            body_stats::query()->where('date',$date)->where('user_id',$user_id)->update(['weight'=>$request->weight]);
         }
+        else{
+            $temp->save();
+        }
+
+        $latest_weight = body_stats::query()->where('user_id',$user->user_id)->orderBy('date','desc')->first();
+        $user->weight = $latest_weight->weight;
+        $user->save();
+
+        return response()->json(["success"=>true, "message"=>"Body Stats Saved Successfully"]);
     }
 
     public function saveHeight(Request $request){
@@ -424,5 +431,41 @@ class userController extends Controller
         $user->height_new = $height;
 
         return response()->json(['success'=>$user->save()]);
+    }
+
+    public function bodyStats(){
+        $user = Auth::user();
+        $result['heights']['height_new'] = $user->height_new;
+        $result['heights']['height'] = $user->height;
+
+        $result['weight_graph'] = body_stats::query()->where('user_id',$user->user_id)->get();
+
+        $result['weights']['current_weight'] = $user->weight;
+
+        $temp = clone($result['weight_graph']);
+        for ($i=0;$i<count($temp);$i++){
+            $temp[$i] = $result['weight_graph'][$i]['weight'];
+        }
+        $result['weights']['heaviest_weight'] = max(json_decode($temp,true));
+        $result['weights']['lightest_weight'] = min(json_decode($temp,true));
+
+        $weight = $user->weight;
+        $height = $user->height_new;
+        $bmi = $weight/($height/100*$height/100);
+
+        if($bmi < 18.5)
+            $status = "Underweight";
+        else if($bmi >= 18.5 && $bmi <25 )
+            $status = "Healthy";
+        else if($bmi >= 25 && $bmi <30)
+            $status = "Overweight";
+        else{
+            $status = "Obese";
+        }
+
+        $result['BMI']['BMI'] = $bmi;
+        $result['BMI']['Body Status'] = $status;
+
+        return response()->json($result);
     }
 }
