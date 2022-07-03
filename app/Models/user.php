@@ -37,6 +37,7 @@ class user extends Authenticatable
         'plank',
         'knee',
         'height',
+        'height_new',
         'weight',
         'active_program_id',
         'active_private_program_id',
