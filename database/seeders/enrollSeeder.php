@@ -19,6 +19,10 @@ class enrollSeeder extends Seeder
     public function run()
     {
         user::factory()->count(10)->create();
+        program::factory()->create(['name'=>'Muscle Fitness','coach_id'=>null]);
+        program::factory()->create(['name'=>'Weight Loss','coach_id'=>null]);
+        program::factory()->create(['name'=>'Height Increase','coach_id'=>null]);
+        program::factory()->create(['name'=>'Stretching','coach_id'=>null]);
         program::factory()->count(10)->create();
         enroll::factory()->count(10)->create(['user_id'=>1]);
         enroll::factory()->count(5)->create(['program_id'=>3]);

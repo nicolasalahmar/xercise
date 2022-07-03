@@ -348,7 +348,7 @@ class userController extends Controller
         if($coach['rating'] != null){
             $coach['rating'] = $coach['rating']['rating'];
         }
-        return response()->json($coach);    
+        return response()->json($coach);
     }
 
 
@@ -382,7 +382,6 @@ class userController extends Controller
         foreach($program_id as $prog){
         $en->program_id = $prog;
         }
-        $en->done = 0;
 
         if($en->save()){
             return response()->json(["success"=>true, "message"=>"Default Plan Added Successfully"]);

@@ -21,7 +21,7 @@ return new class extends Migration
             $table->foreign('private_program_id')->references('private_program_id')->on('private_programs')->onDelete('cascade');
             $table->primary(['user_id', 'private_program_id']);
 
-        $table->boolean('done');
+        $table->boolean('done')->default(false);
         $table->timestamps();
     });
 

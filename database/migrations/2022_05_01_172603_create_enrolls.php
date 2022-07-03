@@ -22,7 +22,7 @@ return new class extends Migration
 
             $table->primary(['user_id', 'program_id']);
 
-            $table->boolean('done');
+            $table->boolean('done')->default(false);
             $table->timestamps();
         });
     }
