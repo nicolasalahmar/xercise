@@ -93,6 +93,7 @@ class AuthController extends Controller
            // 'image'=>null,
         	'DOB'=>$DOB,
             'height'=>$height,
+            'height_new'=>$height,
             'weight'=>$weight,
             'initial_plan'=>$initial_plan,
             'times_a_week'=>$times_a_week,
