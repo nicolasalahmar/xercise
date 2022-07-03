@@ -354,7 +354,6 @@ class userController extends Controller
 
     public function addOtherDefaultPlan(Request $request){
         $user = Auth::user();
-
         $validator = Validator::make($request->all(),[
             'name'=>['required','in:Muscle Fitness,Weight Loss,Height Increase,Stretching'],
     	]);
@@ -373,7 +372,6 @@ class userController extends Controller
                     return response()->json(["success"=>false, "message"=>"Default Plan Already Exists"]);
                 }
             }
-
         }
 
         $en = new enroll();
@@ -386,11 +384,9 @@ class userController extends Controller
 
         if($en->save()){
             return response()->json(["success"=>true, "message"=>"Default Plan Added Successfully"]);
-        }
-        else {
+        }else {
             return response()->json(["success"=>false, "message"=>"Error Adding Default Plan"]);
         }
-
     }
 
 }
