@@ -221,7 +221,7 @@ class planController extends Controller
         if($user->active_private_program_id != NULL){
 
             //plan name
-            $name = program::query()->where('private_program_id',$user->active_private_program_id)->pluck('name');
+            $name = private_program::query()->where('private_program_id',$user->active_private_program_id)->pluck('name');
             $card['plan_name'] = $name[0];
             //author
             $coach_id = private_program::query()->where('private_program_id',$user->active_private_program_id)->pluck('coach_id');
