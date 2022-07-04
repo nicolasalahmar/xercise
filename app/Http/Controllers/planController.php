@@ -119,6 +119,9 @@ class planController extends Controller
             $firstName=coach::where('coach_id', $temp['coach_id'])->first('firstName');
             $lastName=coach::where('coach_id', $temp['coach_id'])->first('lastName');
 
+            $temp['program_id'] = $temp['private_program_id'];
+            unset($temp['private_program_id']);
+
             if($firstName == NULL)
             {
                 $temp['author']='Custom Plan';
@@ -136,7 +139,7 @@ class planController extends Controller
     }
 
     //view active plan details on homescreen
-    public function viewActivePlan(){
+    public function viewActivePlan(){       //Hrayr should return workout stats even if the day is rest
         $user = Auth::user();
         //user_id
         $card['user_id'] = $user->user_id;
@@ -213,6 +216,12 @@ class planController extends Controller
                  }
                 $t = json_decode($t,true);
                 $t = array_sum($t);
+                if(workout_stats::query()->where('user_id',$user->user_id)->where('program_id',$user->active_program_id)->where('day_num',$i)->exists()){
+                    $card['all_workout_days'][$i]['done']=true;
+                }
+                else{
+                    $card['all_workout_days'][$i]['done']=false;
+                }
                 $card['all_workout_days'][$i]['duration']=$t;
             }
 
@@ -275,6 +284,23 @@ class planController extends Controller
             $card['plan_progress'] = (int)($day*100/28).'%';
 
             //all workout days
+            $something = array();
+            for($i=1;$i<=28;$i++){
+                $t = exercise_private_program::query()->where('private_program_id',$user->active_private_program_id)->where('day',$i)->pluck('ex_id');
+                for($j=0;$j<count($t);$j++){
+                    $temp =  exercise::query()->where('ex_id',$t[$j])->pluck('duration');
+                    $t[$j] = $temp[0];
+                 }
+                $t = json_decode($t,true);
+                $t = array_sum($t);
+                if(workout_stats::query()->where('user_id',$user->user_id)->where('private_program_id',$user->active_private_program_id)->where('day_num',$i)->exists()){
+                    $card['all_workout_days'][$i]['done']=true;
+                }
+                else{
+                    $card['all_workout_days'][$i]['done']=false;
+                }
+                $card['all_workout_days'][$i]['duration']=$t;
+            }
         }
 
         return $card;
@@ -287,7 +313,7 @@ class planController extends Controller
         $details['day'] = 'Day '.$request->day;
 
         if($user->active_program_id != NULL){
-            $exercises = exercise_program::query()->where('program_id',$user->active_program_id)->where('day_num',$request->day)->pluck('ex_id');
+            $exercises = exercise_program::query()->where('program_id',$user->active_program_id)->where('day',$request->day)->pluck('ex_id');
             for($i=0;$i<count($exercises);$i++){
                $temp =  exercise::query()->where('ex_id',$exercises[$i])->pluck('duration');
                $exercises[$i] = $temp[0];
@@ -297,7 +323,7 @@ class planController extends Controller
 
             $details['workouts'] = count($exercises);
 
-            $exercises_names = exercise_program::query()->where('program_id',$user->active_program_id)->where('day_num',$request->day)->get(['ex_id','reps','sets']);
+            $exercises_names = exercise_program::query()->where('program_id',$user->active_program_id)->where('day',$request->day)->get(['ex_id','reps','sets']);
 
             foreach($exercises_names as $ex){
                $temp =  exercise::query()->where('ex_id',$ex['ex_id'])->pluck('name');
@@ -307,7 +333,7 @@ class planController extends Controller
         }
 
         if($user->active_private_program_id != NULL){
-            $exercises = exercise_private_program::query()->where('private_program_id',$user->active_private_program_id)->where('day_num',$request->day)->pluck('ex_id');
+            $exercises = exercise_private_program::query()->where('private_program_id',$user->active_private_program_id)->where('day',$request->day)->pluck('ex_id');
             for($i=0;$i<count($exercises);$i++){
                $temp =  exercise::query()->where('ex_id',$exercises[$i])->pluck('duration');
                $exercises[$i] = $temp[0];
@@ -317,7 +343,7 @@ class planController extends Controller
 
             $details['workouts'] = count($exercises);
 
-            $exercises_names = exercise_private_program::query()->where('private_program_id',$user->active_private_program_id)->where('day_num',$request->day)->get(['ex_id','reps','sets']);
+            $exercises_names = exercise_private_program::query()->where('private_program_id',$user->active_private_program_id)->where('day',$request->day)->get(['ex_id','reps','sets']);
 
             foreach($exercises_names as $ex){
                $temp =  exercise::query()->where('ex_id',$ex['ex_id'])->pluck('name');
