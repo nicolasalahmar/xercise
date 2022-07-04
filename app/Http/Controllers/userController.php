@@ -507,14 +507,14 @@ class userController extends Controller
         $result['heights']['height_new'] = $user->height_new;
         $result['heights']['height'] = $user->height;
 
-        $result['weight_graph'] = body_stats::query()->where('user_id',$user->user_id)->get();
-
+        $result['weight_graph'] = body_stats::query()->where('user_id',$user->user_id)->orderBy('date','desc')->get();  //this will return the weights in descending order
         $result['weights']['current_weight'] = $user->weight;
 
         $temp = clone($result['weight_graph']);
         for ($i=0;$i<count($temp);$i++){
             $temp[$i] = $result['weight_graph'][$i]['weight'];
         }
+        $temp[$i] = $user->weight;
 
         $result['weights']['heaviest_weight'] = max(json_decode($temp,true));
         $result['weights']['lightest_weight'] = min(json_decode($temp,true));
