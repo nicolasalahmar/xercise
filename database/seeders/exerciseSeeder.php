@@ -930,7 +930,8 @@ class exerciseSeeder extends Seeder
               "Knee": "No",
               "duration": 2
             },
-            { "name": "Wrist Circles", "exercise_id": 188, "Knee": "Yes", "duration": 2 }
+            { "name": "Wrist Circles", "exercise_id": 188, "Knee": "Yes", "duration": 2 },
+            { "name": "rest", "exercise_id": 189, "Knee": "No", "duration": 2 }
           ]';
         $data = json_decode($exercise_list,true);
         foreach($data as $exercise){
