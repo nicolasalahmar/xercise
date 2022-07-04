@@ -40,5 +40,4 @@ Route::group( ['prefix' => 'user','middleware' => ['auth:user-api','scopes:user'
     Route::post('saveheight', 'userController@saveHeight');
     Route::get('bodystats', 'userController@bodyStats');
     Route::get('statistics', 'userController@statistics');
-    Route::get('viewactiveplan', 'planController@viewActivePlan');
 });
