@@ -11,7 +11,7 @@ class program extends Model
 
     public $primaryKey='program_id';
 
-    public $fillable=['name','description','rating','coach_id','knee','duration','category'];
+    public $fillable=['name','description','rating','coach_id','knee','duration','category','Kcal'];
 
     public $timestamps=true;
 

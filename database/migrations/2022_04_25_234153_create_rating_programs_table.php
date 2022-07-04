@@ -25,10 +25,6 @@ return new class extends Migration
 
             $table->enum('rating', ['1', '2', '3', '4', '5']);
         });
-
-        Schema::table('rating_programs',function(Blueprint $table){
-
-    });
     }
 
     /**
