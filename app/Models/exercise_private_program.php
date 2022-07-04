@@ -11,7 +11,7 @@ class exercise_private_program extends Model
 
     public $primaryKey = ['program_id','ex_id'];
 
-    public $fillable=['reps','duration','day_num'];
+    public $fillable=['sets','reps','duration','day_num'];
 
     public $incrementing = false;
 

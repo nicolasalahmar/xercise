@@ -19,6 +19,7 @@ class workout_stats extends Model
         'Kcal',
         'program_id',
         'private_program_id',
+        'day_num'
     ];
 
     protected static function newFactory()
