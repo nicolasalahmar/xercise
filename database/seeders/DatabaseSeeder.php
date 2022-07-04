@@ -18,7 +18,8 @@ class DatabaseSeeder extends Seeder
             enrollSeeder::class,
             privateEnrollSeeder::class,
             workoutStatsSeeder::class,
-            exerciseSeeder::class
+            exerciseSeeder::class,
+            exerciseProgramSeeder::class
         ]);
     }
 }
