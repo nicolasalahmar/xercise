@@ -253,8 +253,13 @@ class planController extends Controller
             $card['plan_duration'] = $hours * 60 + (int)$minutes;
 
             //workout day
-            $stats = workout_stats::query()->where('user_id',$user->user_id)->where('private_program_id',$user->active_private_program_id)->orderBy('created_at','desc')->get('day_num');
-            $day = count($stats) + 1;
+            $stats = workout_stats::query()->where('user_id',$user->user_id)->where('private_program_id',$user->active_private_program_id)->orderBy('created_at','desc')->first('day_num');
+            if($stats == null){
+                $day=1;
+            }
+            else{
+                $day = $stats['day_num'] + 1;
+            }
             $card['workout_day'] = $day;
 
             //workout duration
