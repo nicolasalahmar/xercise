@@ -17,7 +17,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             enrollSeeder::class,
             privateEnrollSeeder::class,
-            workoutStatsSeeder::class
+            workoutStatsSeeder::class,
+            exerciseSeeder::class
         ]);
     }
 }

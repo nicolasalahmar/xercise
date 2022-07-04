@@ -16,5 +16,7 @@ class exercise extends Model
         'knee'
     ];
 
+    public $timestamps = false;
+
     use HasFactory;
 }
