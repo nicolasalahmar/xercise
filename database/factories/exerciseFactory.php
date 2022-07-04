@@ -21,6 +21,7 @@ class exerciseFactory extends Factory
             'ex_id' => $this->faker->numberBetween(0,188),
             'name' => $this->faker->name(),
             'knee' => $this->faker->randomElement(['Yes','No','A little']),
+            'duration' => $this->faker->randomElement(['2.5','2']),
         ];
     }
 }

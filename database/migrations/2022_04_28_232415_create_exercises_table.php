@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('exercises', function (Blueprint $table) {
             $table->bigIncrements('ex_id');
             $table->text('name');
+            $table->float('duration');
             $table->enum('knee',['Yes','No','A little']);
         });
     }
