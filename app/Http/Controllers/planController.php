@@ -159,9 +159,9 @@ class planController extends Controller
                 $author = $first_name[0].' '.$last_name[0];
             }
             $card['plan_author'] = $author;
-            
+
             //kcal
-            $kcal = program::query()->where('program_id',$user->active_program_id)->pluck('kcal');
+            $kcal = program::query()->where('program_id',$user->active_program_id)->pluck('Kcal');
             $card['plan_kcal'] = $kcal[0];
 
             //duration
@@ -179,12 +179,19 @@ class planController extends Controller
             $card['plan_duration'] = $hours * 60 + (int)$minutes;
 
             //workout day
-            $stats = workout_stats::query()->where('user_id',$user->user_id)->where('program_id',$user->active_program_id)->orderBy('created_at','desc')->get('day_num');
-            $day = count($stats) + 1;
+            $stats = workout_stats::query()->where('user_id',$user->user_id)->where('program_id',$user->active_program_id)->orderBy('created_at','desc')->first('day_num');
+
+            if($stats == null){
+                $day=1;
+            }
+            else{
+                $day = $stats['day_num'] + 1;
+            }
+
             $card['workout_day'] = $day;
 
             //workout duration
-            $exercises = exercise_program::query()->where('program_id',$user->active_program_id)->where('day_num',$day)->pluck('ex_id');
+            $exercises = exercise_program::query()->where('program_id',$user->active_program_id)->where('day',$day)->pluck('ex_id');
             for($i=0;$i<count($exercises);$i++){
                $temp =  exercise::query()->where('ex_id',$exercises[$i])->pluck('duration');
                $exercises[$i] = $temp[0];
@@ -196,6 +203,18 @@ class planController extends Controller
             $card['plan_progress'] = (int)($day*100/28).'%';
 
             //all workout days
+            //$temp[i][duration]=
+            $something = array();
+            for($i=1;$i<=28;$i++){
+                $t = exercise_program::query()->where('program_id',$user->active_program_id)->where('day',$i)->pluck('ex_id');
+                for($j=0;$j<count($t);$j++){
+                    $temp =  exercise::query()->where('ex_id',$t[$j])->pluck('duration');
+                    $t[$j] = $temp[0];
+                 }
+                $t = json_decode($t,true);
+                $t = array_sum($t);
+                $card['all_workout_days'][$i]['duration']=$t;
+            }
 
         }
 
@@ -214,9 +233,9 @@ class planController extends Controller
                 $author = $first_name[0].' '.$last_name[0];
             }
             $card['plan_author'] = $author;
-            
+
             //kcal
-            $kcal = private_program::query()->where('private_program_id',$user->active_private_program_id)->pluck('kcal');
+            $kcal = private_program::query()->where('private_program_id',$user->active_private_program_id)->pluck('Kcal');
             $card['plan_kcal'] = $kcal[0];
 
             //duration
@@ -239,7 +258,7 @@ class planController extends Controller
             $card['workout_day'] = $day;
 
             //workout duration
-            $exercises = exercise_private_program::query()->where('private_program_id',$user->active_private_program_id)->where('day_num',$day)->pluck('ex_id');
+            $exercises = exercise_private_program::query()->where('private_program_id',$user->active_private_program_id)->where('day',$day)->pluck('ex_id');
             for($i=0;$i<count($exercises);$i++){
                $temp =  exercise::query()->where('ex_id',$exercises[$i])->pluck('duration');
                $exercises[$i] = $temp[0];
