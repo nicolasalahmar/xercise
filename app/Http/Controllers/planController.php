@@ -276,4 +276,83 @@ class planController extends Controller
 
     }
 
+
+    public function currentWorkoutDetails(Request $request){
+        $user = Auth::user();
+        $details['day'] = 'Day '.$request->day;
+
+        if($user->active_program_id != NULL){
+            $exercises = exercise_program::query()->where('program_id',$user->active_program_id)->where('day_num',$request->day)->pluck('ex_id');
+            for($i=0;$i<count($exercises);$i++){
+               $temp =  exercise::query()->where('ex_id',$exercises[$i])->pluck('duration');
+               $exercises[$i] = $temp[0];
+            }
+            $exercises = json_decode($exercises,true);
+            $details['duration'] = array_sum($exercises);
+
+            $details['workouts'] = count($exercises);
+
+            $exercises_names = exercise_program::query()->where('program_id',$user->active_program_id)->where('day_num',$request->day)->get(['ex_id','reps','sets']);
+
+            foreach($exercises_names as $ex){
+               $temp =  exercise::query()->where('ex_id',$ex['ex_id'])->pluck('name');
+               $ex['name'] = $temp[0];
+            }
+            $details['exercises'] = $exercises_names;
+        }
+
+        if($user->active_private_program_id != NULL){
+            $exercises = exercise_private_program::query()->where('private_program_id',$user->active_private_program_id)->where('day_num',$request->day)->pluck('ex_id');
+            for($i=0;$i<count($exercises);$i++){
+               $temp =  exercise::query()->where('ex_id',$exercises[$i])->pluck('duration');
+               $exercises[$i] = $temp[0];
+            }
+            $exercises = json_decode($exercises,true);
+            $details['duration'] = array_sum($exercises);
+
+            $details['workouts'] = count($exercises);
+
+            $exercises_names = exercise_private_program::query()->where('private_program_id',$user->active_private_program_id)->where('day_num',$request->day)->get(['ex_id','reps','sets']);
+
+            foreach($exercises_names as $ex){
+               $temp =  exercise::query()->where('ex_id',$ex['ex_id'])->pluck('name');
+               $ex['name'] = $temp[0];
+            }
+            $details['exercises'] = $exercises_names;
+        }
+
+        return response()->json($details);
+    }
+
+
+    public function saveWorkoutStats(Request $request){
+        $user = Auth::user();
+
+        $validator = Validator::make($request->all(),[
+            'duration'=>['required','date_format:H:i:s'],
+            'kcal'=>['required','numeric'],
+            'day_num'=>['required','numeric'],
+            ]);
+        if($validator->fails()){
+            return $validator->errors()->all();
+        }
+
+        $stats = new workout_stats();
+
+        $stats->user_id = $user->user_id;
+        $stats->program_id = $user->active_program_id;
+        $stats->private_program_id = $user->active_private_program_id;
+        $stats->duration = $request->duration;
+        $stats->kcal = $request->kcal;
+        $stats->day_num = $request->day_num;
+
+        if($stats->save()){
+            return response()->json(["success"=>true, "message"=>"Stats Saved Successfully"]);
+        }else {
+            return response()->json(["success"=>false, "message"=>"Error Saving Stats"]);
+        }
+
+
+    }
+
 }
