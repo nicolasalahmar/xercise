@@ -14,6 +14,10 @@ use App\Models\enroll;
 use App\Models\private_enroll;
 use App\Models\program;
 use App\Models\private_program;
+use App\Models\exercise_program;
+use App\Models\exercise_private_program;
+use App\Models\exercise;
+
 
 use Auth;
 use Storage;
@@ -131,31 +135,126 @@ class planController extends Controller
         return response()->json(array_merge($a1,$a2));
     }
 
-    /*public function viewActivePlan(Request $request){   //for the homescreen
+    //view active plan details on homescreen
+    public function viewActivePlan(){
         $user = Auth::user();
-        if($user->active_program_id == null){
-            if($user->active_private_program_id == null){
-                return response()->json(['success'=>false, 'message'=>'No active plan']);
+        //user_id
+        $card['user_id'] = $user->user_id;
+        //user first name
+        $ufirst_name = user::query()->where('user_id',$user->user_id)->pluck('FirstName');
+        $card['user'] = $ufirst_name[0];
+
+        if($user->active_program_id != NULL){
+
+            //plan name
+            $name = program::query()->where('program_id',$user->active_program_id)->pluck('name');
+            $card['plan_name'] = $name[0];
+            //author
+            $coach_id = program::query()->where('program_id',$user->active_program_id)->pluck('coach_id');
+            if($coach_id[0] == NULL){
+                $author = 'Xercise';
+            }else{
+                $first_name = coach::query()->where('coach_id',$coach_id[0])->pluck('FirstName');
+                $last_name = coach::query()->where('coach_id',$coach_id[0])->pluck('LastName');
+                $author = $first_name[0].' '.$last_name[0];
             }
-            else{
-                $active_private_program = private_program::query()->where('private_program_id',$user->active_private_program_id)->first();
-                $active_private_program['type'] = 'private';
-                return $stats = workout_stats::query()->where('private_program_id',$user->active_private_program_id)->orderBy('dateTime','ASC')->get();//if the user plays the same plan twice the progress will overlap
-                foreach($stats as $stat){
-                    $stat['percentage'] = $stat['duration']/$active_private_program['duration'];
-                    unset($stat['dateTime']);
-                    unset($stat['workout_stats_id']);
-                }
-                $active_private_program['stats']=$stats;                    //
-                $active_private_program['author'] = coach::query()->where('coach_id',$active_private_program['coach_id'])->first('firstName')['firstName'].' '.coach::query()->where('coach_id',$active_private_program['coach_id'])->first('lastName')['lastName'];
-                return response()->json(['success'=>true, 'message'=>'Active plan', 'active_plan'=>$active_private_program]);
+            $card['plan_author'] = $author;
+            
+            //kcal
+            $kcal = program::query()->where('program_id',$user->active_program_id)->pluck('kcal');
+            $card['plan_kcal'] = $kcal[0];
+
+            //duration
+            $duration = program::query()->where('program_id',$user->active_program_id)->pluck('duration');
+                                            //helper function to convert duration into minutes only
+            $sum = strtotime('00:00:00');
+            $sum2=0;
+            foreach ($duration as $d){
+                $sum1=strtotime($d)-$sum;
+                $sum2 = $sum2+$sum1;
             }
+            $sum3=$sum+$sum2;
+            $time = date("H:i:s",$sum3);
+            [$hours, $minutes] = explode(':', $time);
+            $card['plan_duration'] = $hours * 60 + (int)$minutes;
+
+            //workout day
+            $stats = workout_stats::query()->where('user_id',$user->user_id)->where('program_id',$user->active_program_id)->orderBy('created_at','desc')->get('day_num');
+            $day = count($stats) + 1;
+            $card['workout_day'] = $day;
+
+            //workout duration
+            $exercises = exercise_program::query()->where('program_id',$user->active_program_id)->where('day_num',$day)->pluck('ex_id');
+            for($i=0;$i<count($exercises);$i++){
+               $temp =  exercise::query()->where('ex_id',$exercises[$i])->pluck('duration');
+               $exercises[$i] = $temp[0];
+            }
+            $exercises = json_decode($exercises,true);
+            $card['workout_duration'] = array_sum($exercises);
+
+            //plan progress
+            $card['plan_progress'] = (int)($day*100/28).'%';
+
+            //all workout days
+
         }
-        else{
-            $active_program = program::query()->where('program_id',$user->active_program_id)->first();
-            $active_program['type'] = 'public';
-            $active_program['author'] = coach::query()->where('coach_id',$active_program['coach_id'])->first('firstName')['firstName'].' '.coach::query()->where('coach_id',$active_program['coach_id'])->first('lastName')['lastName'];
-            return response()->json(['success'=>true, 'message'=>'Active plan', 'active_plan'=>$active_program]);
+
+        if($user->active_private_program_id != NULL){
+
+            //plan name
+            $name = program::query()->where('private_program_id',$user->active_private_program_id)->pluck('name');
+            $card['plan_name'] = $name[0];
+            //author
+            $coach_id = private_program::query()->where('private_program_id',$user->active_private_program_id)->pluck('coach_id');
+            if($coach_id[0] == NULL){
+                $author = 'Custom';
+            }else{
+                $first_name = coach::query()->where('coach_id',$coach_id[0])->pluck('FirstName');
+                $last_name = coach::query()->where('coach_id',$coach_id[0])->pluck('LastName');
+                $author = $first_name[0].' '.$last_name[0];
+            }
+            $card['plan_author'] = $author;
+            
+            //kcal
+            $kcal = private_program::query()->where('private_program_id',$user->active_private_program_id)->pluck('kcal');
+            $card['plan_kcal'] = $kcal[0];
+
+            //duration
+            $duration = private_program::query()->where('private_program_id',$user->active_private_program_id)->pluck('duration');
+                                            //helper function to convert duration into minutes only
+            $sum = strtotime('00:00:00');
+            $sum2=0;
+            foreach ($duration as $d){
+                $sum1=strtotime($d)-$sum;
+                $sum2 = $sum2+$sum1;
+            }
+            $sum3=$sum+$sum2;
+            $time = date("H:i:s",$sum3);
+            [$hours, $minutes] = explode(':', $time);
+            $card['plan_duration'] = $hours * 60 + (int)$minutes;
+
+            //workout day
+            $stats = workout_stats::query()->where('user_id',$user->user_id)->where('private_program_id',$user->active_private_program_id)->orderBy('created_at','desc')->get('day_num');
+            $day = count($stats) + 1;
+            $card['workout_day'] = $day;
+
+            //workout duration
+            $exercises = exercise_private_program::query()->where('private_program_id',$user->active_private_program_id)->where('day_num',$day)->pluck('ex_id');
+            for($i=0;$i<count($exercises);$i++){
+               $temp =  exercise::query()->where('ex_id',$exercises[$i])->pluck('duration');
+               $exercises[$i] = $temp[0];
+            }
+            $exercises = json_decode($exercises,true);
+            $card['workout_duration'] = array_sum($exercises);
+
+            //plan progress
+            $card['plan_progress'] = (int)($day*100/28).'%';
+
+            //all workout days
         }
-    }*/
+
+        return $card;
+
+    }
+
 }
