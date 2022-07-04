@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Database\Factories\exerciseProgramFactory;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -9,13 +11,18 @@ class exercise_program extends Model
 {
     public $table='exercise_programs';
 
-    public $primaryKey = ['program_id','ex_id'];
+    public $primaryKey = ['program_id','ex_id','day'];
 
-    public $fillable=['sets','reps','duration','day_num'];
+    public $fillable=['sets','reps','duration'];
 
     public $incrementing = false;
 
-    public $timestamps = true;
+    public $timestamps = false;
+
+    protected static function newFactory()
+    {
+        return exerciseProgramFactory::new();
+    }
 
     use HasFactory;
 }

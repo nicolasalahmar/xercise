@@ -9,13 +9,13 @@ class exercise_private_program extends Model
 {
     public $table='exercise_private_programs';
 
-    public $primaryKey = ['program_id','ex_id'];
+    public $primaryKey = ['program_id','ex_id','day'];
 
-    public $fillable=['sets','reps','duration','day_num'];
+    public $fillable=['sets','reps','duration'];
 
     public $incrementing = false;
 
-    public $timestamps = true;
+    public $timestamps = false;
 
     use HasFactory;
 }
