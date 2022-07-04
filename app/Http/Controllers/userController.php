@@ -278,15 +278,15 @@ class userController extends Controller
     public function viewSleep(){
         $user = Auth::user();
         $week = array();
-        $week[0] = DB::table('sleep_trackers')->where('user_id',$user->user_id)->where('date',Carbon::now()->subDays(6)->format('y-m-d'))->first();
-        $week[1] = DB::table('sleep_trackers')->where('user_id',$user->user_id)->where('date',Carbon::now()->subDays(5)->format('y-m-d'))->first();
-        $week[2] = DB::table('sleep_trackers')->where('user_id',$user->user_id)->where('date',Carbon::now()->subDays(4)->format('y-m-d'))->first();
-        $week[3] = DB::table('sleep_trackers')->where('user_id',$user->user_id)->where('date',Carbon::now()->subDays(3)->format('y-m-d'))->first();
-        $week[4] = DB::table('sleep_trackers')->where('user_id',$user->user_id)->where('date',Carbon::now()->subDays(2)->format('y-m-d'))->first();
-        $week[5] = DB::table('sleep_trackers')->where('user_id',$user->user_id)->where('date',Carbon::now()->subDays(1)->format('y-m-d'))->first();
-        $week[6] = DB::table('sleep_trackers')->where('user_id',$user->user_id)->where('date',Carbon::now()->format('y-m-d'))->first();
+        $week[0] = DB::table('sleep_trackers')->where('user_id',$user->user_id)->where('date',Carbon::now()->subDays(7)->format('y-m-d'))->first();
+        $week[1] = DB::table('sleep_trackers')->where('user_id',$user->user_id)->where('date',Carbon::now()->subDays(6)->format('y-m-d'))->first();
+        $week[2] = DB::table('sleep_trackers')->where('user_id',$user->user_id)->where('date',Carbon::now()->subDays(5)->format('y-m-d'))->first();
+        $week[3] = DB::table('sleep_trackers')->where('user_id',$user->user_id)->where('date',Carbon::now()->subDays(4)->format('y-m-d'))->first();
+        $week[4] = DB::table('sleep_trackers')->where('user_id',$user->user_id)->where('date',Carbon::now()->subDays(3)->format('y-m-d'))->first();
+        $week[5] = DB::table('sleep_trackers')->where('user_id',$user->user_id)->where('date',Carbon::now()->subDays(2)->format('y-m-d'))->first();
+        $week[6] = DB::table('sleep_trackers')->where('user_id',$user->user_id)->where('date',Carbon::now()->subDays(1)->format('y-m-d'))->first();
 
-        return response()->json(['graph data'=>$week]);
+        return $week;
     }
 
     public function calculateSleep(Request $request){
@@ -412,7 +412,7 @@ class userController extends Controller
             $dur =  json_decode($durations,true); // to convert collection into array
             //helper function to calculate sum of durations and convert it into minutes
             $sum = strtotime('00:00:00');
-            $sum2=0;  
+            $sum2=0;
             foreach ($dur as $d){
                 $sum1=strtotime($d)-$sum;
                 $sum2 = $sum2+$sum1;
@@ -423,7 +423,7 @@ class userController extends Controller
 
             $stats['duration'] = $hours * 60 + (int)$minutes;
             //---------------------------------------------
-            return response()->json($stats);
+            return $stats;
         }
 
         if($user->active_private_program_id != NULL){
@@ -443,7 +443,7 @@ class userController extends Controller
             $dur =  json_decode($durations,true); // to convert collection into array
             //helper function to calculate sum of durations and convert it into minutes
             $sum = strtotime('00:00:00');
-            $sum2=0;  
+            $sum2=0;
             foreach ($dur as $d){
                 $sum1=strtotime($d)-$sum;
                 $sum2 = $sum2+$sum1;
@@ -453,9 +453,9 @@ class userController extends Controller
             [$hours, $minutes] = explode(':', $time);
 
             $stats['duration'] = $hours * 60 + (int)$minutes;
-             
+
             //---------------------------------------------
-            return response()->json($stats);
+            return $stats;
         }
     }
 
@@ -515,6 +515,7 @@ class userController extends Controller
         for ($i=0;$i<count($temp);$i++){
             $temp[$i] = $result['weight_graph'][$i]['weight'];
         }
+
         $result['weights']['heaviest_weight'] = max(json_decode($temp,true));
         $result['weights']['lightest_weight'] = min(json_decode($temp,true));
 
@@ -535,6 +536,13 @@ class userController extends Controller
         $result['BMI']['BMI'] = $bmi;
         $result['BMI']['Body Status'] = $status;
 
+        return $result;
+    }
+
+    public function statistics(){
+        $result['workout_stats']=$this->workoutStats();
+        $result['body_stats']=$this->bodyStats();
+        $result['sleep_stats']=$this->viewSleep();
         return response()->json($result);
     }
 }

@@ -107,6 +107,13 @@ class AuthController extends Controller
            // 'steps'=>0,
             //'step_update'=>date('Y-m-d'),
         ]);
+
+        $temp = new body_stats();
+        $temp->user_id = $user->user_id;
+        $temp->weight = $weight;
+        $temp->date = date('y-m-d');
+        $temp->save();
+
         if($user->user_id){
             if($request->has('encodedImage'))
                 $this->saveImage((string)$user->user_id,$request->encodedImage,'users');

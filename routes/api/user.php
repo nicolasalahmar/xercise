@@ -39,4 +39,5 @@ Route::group( ['prefix' => 'user','middleware' => ['auth:user-api','scopes:user'
     Route::post('saveweight', 'userController@saveWeight');
     Route::post('saveheight', 'userController@saveHeight');
     Route::get('bodystats', 'userController@bodyStats');
+    Route::get('statistics', 'userController@statistics');
 });
