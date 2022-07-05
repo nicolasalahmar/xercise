@@ -316,11 +316,11 @@ class planController extends Controller
                $exercises[$i] = $temp[0];
             }
             $exercises = json_decode($exercises,true);
-            $details['duration'] = array_sum($exercises);
+            $details['total duration'] = array_sum($exercises);
 
             $details['workouts'] = count($exercises);
 
-            $exercises_names = exercise_program::query()->where('program_id',$user->active_program_id)->where('day',$request->day)->get(['ex_id','reps','sets']);
+            $exercises_names = exercise_program::query()->where('program_id',$user->active_program_id)->where('day',$request->day)->get(['ex_id','reps','sets','duration']);
 
             foreach($exercises_names as $ex){
                $temp =  exercise::query()->where('ex_id',$ex['ex_id'])->pluck('name');
@@ -336,11 +336,11 @@ class planController extends Controller
                $exercises[$i] = $temp[0];
             }
             $exercises = json_decode($exercises,true);
-            $details['duration'] = array_sum($exercises);
+            $details['total duration'] = array_sum($exercises);
 
             $details['workouts'] = count($exercises);
 
-            $exercises_names = exercise_private_program::query()->where('private_program_id',$user->active_private_program_id)->where('day',$request->day)->get(['ex_id','reps','sets']);
+            $exercises_names = exercise_private_program::query()->where('private_program_id',$user->active_private_program_id)->where('day',$request->day)->get(['ex_id','reps','sets','duration']);
 
             foreach($exercises_names as $ex){
                $temp =  exercise::query()->where('ex_id',$ex['ex_id'])->pluck('name');
