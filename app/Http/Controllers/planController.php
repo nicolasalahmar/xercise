@@ -119,9 +119,6 @@ class planController extends Controller
             $firstName=coach::where('coach_id', $temp['coach_id'])->first('firstName');
             $lastName=coach::where('coach_id', $temp['coach_id'])->first('lastName');
 
-            $temp['program_id'] = $temp['private_program_id'];
-            unset($temp['private_program_id']);
-
             if($firstName == NULL)
             {
                 $temp['author']='Custom Plan';

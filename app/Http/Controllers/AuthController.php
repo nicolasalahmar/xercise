@@ -36,7 +36,7 @@ class AuthController extends Controller
         if($type == "coaches"){
             DB::table($type)->where('coach_id',$usr_id)->update(['image'=>$imageName]);
             return true;
-    }
+            }
         }
     }
 
