@@ -26,6 +26,9 @@ Route::group( ['prefix' => 'user','middleware' => ['auth:user-api','scopes:user'
     Route::get('viewactiveplan', 'planController@viewActivePlan');
     Route::post('viewcurrentworkout','planController@currentWorkoutDetails');
     Route::post('saveworkoutstats','planController@saveWorkoutStats');
+    Route::post('createcustomplan','planController@createCustomPlan');
+
+    
 
     
 
