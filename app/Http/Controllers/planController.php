@@ -180,7 +180,6 @@ class planController extends Controller
 
             //workout day
             $stats = workout_stats::query()->where('user_id',$user->user_id)->where('program_id',$user->active_program_id)->orderBy('created_at','desc')->first('day_num');
-
             if($stats == null){
                 $day=1;
             }
@@ -374,6 +373,11 @@ class planController extends Controller
         $stats->kcal = $request->kcal;
         $stats->day_num = $request->day_num;
 
+        $duration = $this->sum_the_time($user->duration,$stats->duration);
+
+        $user->duration = $duration;
+        $user->save();
+
         if ($request->day_num == 28){
             if($user->active_program_id != NULL){
                 enroll::query()->where('user_id',$user->user_id)->where('program_id',$user->active_program_id)->update(['done'=>true]);
@@ -391,6 +395,34 @@ class planController extends Controller
 
     }
 
+    function sum_the_time($time1, $time2) {
+        $times = array($time1, $time2);
+        $seconds = 0;
+        foreach ($times as $time)
+        {
+          list($hour,$minute,$second) = explode(':', $time);
+          $seconds += $hour*3600;
+          $seconds += $minute*60;
+          $seconds += $second;
+        }
+        $hours = floor($seconds/3600);
+        $seconds -= $hours*3600;
+        $minutes  = floor($seconds/60);
+        $seconds -= $minutes*60;
+        if($seconds < 9)
+        {
+        $seconds = "0".$seconds;
+        }
+        if($minutes < 9)
+        {
+        $minutes = "0".$minutes;
+        }
+          if($hours < 9)
+        {
+        $hours = "0".$hours;
+        }
+        return "{$hours}:{$minutes}:{$seconds}";
+    }
 
     public function createCustomPlan(Request $request){
         $user = Auth::user();
