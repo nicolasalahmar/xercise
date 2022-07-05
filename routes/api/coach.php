@@ -26,5 +26,4 @@ Route::group( ['prefix' => 'coach','middleware' => ['auth:coach-api','scopes:coa
     Route::get('viewcoachdashboard','coachController@viewCoachDashboard');
     Route::post('deletecoachplan','coachController@deletePlan');
     Route::get('viewcoachplans','coachController@viewPlans');
-    Route::post('createplancoach','planController@createPlanCoach');
 });

@@ -27,10 +27,9 @@ Route::group( ['prefix' => 'user','middleware' => ['auth:user-api','scopes:user'
     Route::post('viewcurrentworkout','planController@currentWorkoutDetails');
     Route::post('saveworkoutstats','planController@saveWorkoutStats');
     Route::post('createcustomplan','planController@createCustomPlan');
+});
 
 
-    
-
-    
-
+Route::group( ['prefix' => 'coach','middleware' => ['auth:coach-api','scopes:coach'] ],function(){
+    Route::post('createplancoach','planController@createPlanCoach');
 });

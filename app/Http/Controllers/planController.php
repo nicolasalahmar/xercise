@@ -374,6 +374,15 @@ class planController extends Controller
         $stats->kcal = $request->kcal;
         $stats->day_num = $request->day_num;
 
+        if ($request->day_num == 28){
+            if($user->active_program_id != NULL){
+                enroll::query()->where('user_id',$user->user_id)->where('program_id',$user->active_program_id)->update(['done'=>true]);
+            }
+            elseif ($user->active_private_program_id != NULL){
+                enroll::query()->where('user_id',$user->user_id)->where('private_program_id',$user->active_private_program_id)->update(['done'=>true]);
+            }
+        }
+
         if($stats->save()){
             return response()->json(["success"=>true, "message"=>"Stats Saved Successfully"]);
         }else {
@@ -893,8 +902,11 @@ class planController extends Controller
             $plan->category = $request->category;
             $plan->duration = '00:00:00';
             $plan->kcal = 0.0;
-    
+
             $plan->save();
+
+            $duration = 0;
+            $Kcal = 0;
 
         //filling plan with exercises for each day
         if($request->day1 == NULL){
@@ -949,11 +961,14 @@ class planController extends Controller
                 $ex2->day = 8;
                 $ex3->day = 15;
                 $ex4->day = 22;
-                
+
                 $ex1->save();
                 $ex2->save();
                 $ex3->save();
                 $ex4->save();
+
+                $Kcal += (exercise::query()->where('ex_id',$day[0])->pluck('kcal')[0]*4*$ex1->sets*$ex1->reps);
+                $duration += (exercise::query()->where('ex_id',$day[0])->pluck('duration')[0]*240*$ex1->sets);
             }
         }
 
@@ -1005,15 +1020,18 @@ class planController extends Controller
                 $ex2 = clone $ex1;
                 $ex3 = clone $ex1;
                 $ex4 = clone $ex1;
-    
+
                 $ex2->day = 8+1;
                 $ex3->day = 15+1;
                 $ex4->day = 22+1;
-                
+
                 $ex1->save();
                 $ex2->save();
                 $ex3->save();
                 $ex4->save();
+
+                $Kcal += (exercise::query()->where('ex_id',$day[0])->pluck('kcal')[0]*4*$ex1->sets*$ex1->reps);
+                $duration += (exercise::query()->where('ex_id',$day[0])->pluck('duration')[0]*240*$ex1->sets);
             }
         }
 
@@ -1065,15 +1083,18 @@ class planController extends Controller
                 $ex2 = clone $ex1;
                 $ex3 = clone $ex1;
                 $ex4 = clone $ex1;
-    
+
                 $ex2->day = 8+2;
                 $ex3->day = 15+2;
                 $ex4->day = 22+2;
-                
+
                 $ex1->save();
                 $ex2->save();
                 $ex3->save();
                 $ex4->save();
+
+                $Kcal += (exercise::query()->where('ex_id',$day[0])->pluck('kcal')[0]*4*$ex1->sets*$ex1->reps);
+                $duration += (exercise::query()->where('ex_id',$day[0])->pluck('duration')[0]*240*$ex1->sets);
             }
         }
 
@@ -1125,15 +1146,18 @@ class planController extends Controller
                 $ex2 = clone $ex1;
                 $ex3 = clone $ex1;
                 $ex4 = clone $ex1;
-    
+
                 $ex2->day = 8+3;
                 $ex3->day = 15+3;
                 $ex4->day = 22+3;
-                
+
                 $ex1->save();
                 $ex2->save();
                 $ex3->save();
                 $ex4->save();
+
+                $Kcal += (exercise::query()->where('ex_id',$day[0])->pluck('kcal')[0]*4*$ex1->sets*$ex1->reps);
+                $duration += (exercise::query()->where('ex_id',$day[0])->pluck('duration')[0]*240*$ex1->sets);
             }
         }
 
@@ -1185,15 +1209,18 @@ class planController extends Controller
                 $ex2 = clone $ex1;
                 $ex3 = clone $ex1;
                 $ex4 = clone $ex1;
-    
+
                 $ex2->day = 8+4;
                 $ex3->day = 15+4;
                 $ex4->day = 22+4;
-                
+
                 $ex1->save();
                 $ex2->save();
                 $ex3->save();
                 $ex4->save();
+
+                $Kcal += (exercise::query()->where('ex_id',$day[0])->pluck('kcal')[0]*4*$ex1->sets*$ex1->reps);
+                $duration += (exercise::query()->where('ex_id',$day[0])->pluck('duration')[0]*240*$ex1->sets);
             }
         }
 
@@ -1245,15 +1272,18 @@ class planController extends Controller
                 $ex2 = clone $ex1;
                 $ex3 = clone $ex1;
                 $ex4 = clone $ex1;
-    
+
                 $ex2->day = 8+5;
                 $ex3->day = 15+5;
                 $ex4->day = 22+5;
-                
+
                 $ex1->save();
                 $ex2->save();
                 $ex3->save();
                 $ex4->save();
+
+                $Kcal += (exercise::query()->where('ex_id',$day[0])->pluck('kcal')[0]*4*$ex1->sets*$ex1->reps);
+                $duration += (exercise::query()->where('ex_id',$day[0])->pluck('duration')[0]*240*$ex1->sets);
             }
         }
 
@@ -1305,19 +1335,25 @@ class planController extends Controller
                 $ex2 = clone $ex1;
                 $ex3 = clone $ex1;
                 $ex4 = clone $ex1;
-    
+
                 $ex2->day = 8+6;
                 $ex3->day = 15+6;
                 $ex4->day = 22+6;
-                
+
                 $ex1->save();
                 $ex2->save();
                 $ex3->save();
                 $ex4->save();
+
+                $Kcal += (exercise::query()->where('ex_id',$day[0])->pluck('kcal')[0]*4*$ex1->sets*$ex1->reps);
+                $duration += (exercise::query()->where('ex_id',$day[0])->pluck('duration')[0]*240*$ex1->sets);
             }
         }
 
         //insret calculated kcal and duration here for public program
+        $plan->duration = sprintf('%02d:%02d:%02d', ($duration/ 3600),($duration/ 60 % 60), $duration% 60);
+        $plan->Kcal = $Kcal;
+        $plan->save();
 
         return response()->json(['message'=>'done']);
         }
@@ -1326,58 +1362,60 @@ class planController extends Controller
 
 
         if($request->username !=NULL ){
-            
+
 
             $user_id = user::query()->where('username', $request->username)->pluck('user_id');
             $requested = requests::query()->where('user_id',$user_id[0])->where('coach_id',$coach->coach_id)->get();
 
             if(count($requested)>0){
-            
+
             $plan = new private_program();
             $plan->user_id = $user_id[0];
             $plan->coach_id = $coach->coach_id;
             $plan->name = $request->name;
             $plan->description = $request->description;
-    
+
             $plan->duration = '00:00:00';
             $plan->kcal = 0.0;
-    
+
             $plan->save();
-    
-    
+
+            $duration = 0;
+            $Kcal = 0;
+
             //enrolling user to plan in private enrolls table
             $enroll = new private_enroll();
             $enroll->user_id = $plan->user_id;
             $enroll->private_program_id = $plan->private_program_id;
-    
+
             $enroll->save();
-    
+
             //filling plan with exercises for each day
             if($request->day1 == NULL){
                 $ex1 = new exercise_private_program();
                 $ex2 = new exercise_private_program();
                 $ex3 = new exercise_private_program();
                 $ex4 = new exercise_private_program();
-    
+
                 $ex1->day = 1;
                 $ex1->private_program_id = $plan->private_program_id;
                 $ex1->ex_id = 189;
                 $ex1->reps = 0;
                 $ex1->sets = 0;
                 $ex1->duration = '00:00:00';
-    
+
                 $ex2 = $ex1;
                 $ex3 = $ex1;
                 $ex4 = $ex1;
-    
+
                 $ex2 = clone $ex1;
                 $ex3 = clone $ex1;
                 $ex4 = clone $ex1;
-    
+
                 $ex2->day = 8;
                 $ex3->day = 15;
                 $ex4->day = 22;
-    
+
                 $ex1->save();
                 $ex2->save();
                 $ex3->save();
@@ -1390,54 +1428,57 @@ class planController extends Controller
                     $ex2 = new exercise_private_program();
                     $ex3 = new exercise_private_program();
                     $ex4 = new exercise_private_program();
-    
+
                     $ex1->day = 1;
                     $ex1->private_program_id = $plan->private_program_id;
                     $ex1->ex_id = $day[0];
                     $ex1->reps = $day[1];
                     $ex1->sets = $day[2];
                     $ex1->duration = $day[3];
-    
+
                     $ex2 = clone $ex1;
                     $ex3 = clone $ex1;
                     $ex4 = clone $ex1;
-    
+
                     $ex2->day = 8;
                     $ex3->day = 15;
                     $ex4->day = 22;
-                    
+
                     $ex1->save();
                     $ex2->save();
                     $ex3->save();
                     $ex4->save();
+
+                    $Kcal += (exercise::query()->where('ex_id',$day[0])->pluck('kcal')[0]*4*$ex1->sets*$ex1->reps);
+                    $duration += (exercise::query()->where('ex_id',$day[0])->pluck('duration')[0]*240*$ex1->sets);
                 }
             }
-    
+
             if($request->day2 == NULL){
                 $ex1 = new exercise_private_program();
                 $ex2 = new exercise_private_program();
                 $ex3 = new exercise_private_program();
                 $ex4 = new exercise_private_program();
-    
+
                 $ex1->day = 2;
                 $ex1->private_program_id = $plan->private_program_id;
                 $ex1->ex_id = 189;
                 $ex1->reps = 0;
                 $ex1->sets = 0;
                 $ex1->duration = '00:00:00';
-    
+
                 $ex2 = $ex1;
                 $ex3 = $ex1;
                 $ex4 = $ex1;
-    
+
                 $ex2 = clone $ex1;
                 $ex3 = clone $ex1;
                 $ex4 = clone $ex1;
-    
+
                 $ex2->day = 8+1;
                 $ex3->day = 15+1;
                 $ex4->day = 22+1;
-    
+
                 $ex1->save();
                 $ex2->save();
                 $ex3->save();
@@ -1450,54 +1491,57 @@ class planController extends Controller
                     $ex2 = new exercise_private_program();
                     $ex3 = new exercise_private_program();
                     $ex4 = new exercise_private_program();
-    
+
                     $ex1->day = 2;
                     $ex1->private_program_id = $plan->private_program_id;
                     $ex1->ex_id = $day[0];
                     $ex1->reps = $day[1];
                     $ex1->sets = $day[2];
                     $ex1->duration = $day[3];
-    
+
                     $ex2 = clone $ex1;
                     $ex3 = clone $ex1;
                     $ex4 = clone $ex1;
-        
+
                     $ex2->day = 8+1;
                     $ex3->day = 15+1;
                     $ex4->day = 22+1;
-                    
+
                     $ex1->save();
                     $ex2->save();
                     $ex3->save();
                     $ex4->save();
+
+                    $Kcal += (exercise::query()->where('ex_id',$day[0])->pluck('kcal')[0]*4*$ex1->sets*$ex1->reps);
+                    $duration += (exercise::query()->where('ex_id',$day[0])->pluck('duration')[0]*240*$ex1->sets);
                 }
             }
-    
+
             if($request->day3 == NULL){
                 $ex1 = new exercise_private_program();
                 $ex2 = new exercise_private_program();
                 $ex3 = new exercise_private_program();
                 $ex4 = new exercise_private_program();
-    
+
                 $ex1->day = 3;
                 $ex1->private_program_id = $plan->private_program_id;
                 $ex1->ex_id = 189;
                 $ex1->reps = 0;
                 $ex1->sets = 0;
                 $ex1->duration = '00:00:00';
-    
+
                 $ex2 = $ex1;
                 $ex3 = $ex1;
                 $ex4 = $ex1;
-    
+
                 $ex2 = clone $ex1;
                 $ex3 = clone $ex1;
                 $ex4 = clone $ex1;
-    
+
                 $ex2->day = 8+2;
                 $ex3->day = 15+2;
                 $ex4->day = 22+2;
-    
+
                 $ex1->save();
                 $ex2->save();
                 $ex3->save();
@@ -1510,54 +1554,57 @@ class planController extends Controller
                     $ex2 = new exercise_private_program();
                     $ex3 = new exercise_private_program();
                     $ex4 = new exercise_private_program();
-    
+
                     $ex1->day = 3;
                     $ex1->private_program_id = $plan->private_program_id;
                     $ex1->ex_id = $day[0];
                     $ex1->reps = $day[1];
                     $ex1->sets = $day[2];
                     $ex1->duration = $day[3];
-    
+
                     $ex2 = clone $ex1;
                     $ex3 = clone $ex1;
                     $ex4 = clone $ex1;
-        
+
                     $ex2->day = 8+2;
                     $ex3->day = 15+2;
                     $ex4->day = 22+2;
-                    
+
                     $ex1->save();
                     $ex2->save();
                     $ex3->save();
                     $ex4->save();
+
+                    $Kcal += (exercise::query()->where('ex_id',$day[0])->pluck('kcal')[0]*4*$ex1->sets*$ex1->reps);
+                    $duration += (exercise::query()->where('ex_id',$day[0])->pluck('duration')[0]*240*$ex1->sets);
                 }
             }
-    
+
             if($request->day4 == NULL){
                 $ex1 = new exercise_private_program();
                 $ex2 = new exercise_private_program();
                 $ex3 = new exercise_private_program();
                 $ex4 = new exercise_private_program();
-    
+
                 $ex1->day = 4;
                 $ex1->private_program_id = $plan->private_program_id;
                 $ex1->ex_id = 189;
                 $ex1->reps = 0;
                 $ex1->sets = 0;
                 $ex1->duration = '00:00:00';
-    
+
                 $ex2 = $ex1;
                 $ex3 = $ex1;
                 $ex4 = $ex1;
-    
+
                 $ex2 = clone $ex1;
                 $ex3 = clone $ex1;
                 $ex4 = clone $ex1;
-    
+
                 $ex2->day = 8+3;
                 $ex3->day = 15+3;
                 $ex4->day = 22+3;
-    
+
                 $ex1->save();
                 $ex2->save();
                 $ex3->save();
@@ -1570,54 +1617,57 @@ class planController extends Controller
                     $ex2 = new exercise_private_program();
                     $ex3 = new exercise_private_program();
                     $ex4 = new exercise_private_program();
-    
+
                     $ex1->day = 4;
                     $ex1->private_program_id = $plan->private_program_id;
                     $ex1->ex_id = $day[0];
                     $ex1->reps = $day[1];
                     $ex1->sets = $day[2];
                     $ex1->duration = $day[3];
-    
+
                     $ex2 = clone $ex1;
                     $ex3 = clone $ex1;
                     $ex4 = clone $ex1;
-        
+
                     $ex2->day = 8+3;
                     $ex3->day = 15+3;
                     $ex4->day = 22+3;
-                    
+
                     $ex1->save();
                     $ex2->save();
                     $ex3->save();
                     $ex4->save();
+
+                    $Kcal += (exercise::query()->where('ex_id',$day[0])->pluck('kcal')[0]*4*$ex1->sets*$ex1->reps);
+                    $duration += (exercise::query()->where('ex_id',$day[0])->pluck('duration')[0]*240*$ex1->sets);
                 }
             }
-    
+
             if($request->day5 == NULL){
                 $ex1 = new exercise_private_program();
                 $ex2 = new exercise_private_program();
                 $ex3 = new exercise_private_program();
                 $ex4 = new exercise_private_program();
-    
+
                 $ex1->day = 5;
                 $ex1->private_program_id = $plan->private_program_id;
                 $ex1->ex_id = 189;
                 $ex1->reps = 0;
                 $ex1->sets = 0;
                 $ex1->duration = '00:00:00';
-    
+
                 $ex2 = $ex1;
                 $ex3 = $ex1;
                 $ex4 = $ex1;
-    
+
                 $ex2 = clone $ex1;
                 $ex3 = clone $ex1;
                 $ex4 = clone $ex1;
-    
+
                 $ex2->day = 8+4;
                 $ex3->day = 15+4;
                 $ex4->day = 22+4;
-    
+
                 $ex1->save();
                 $ex2->save();
                 $ex3->save();
@@ -1630,54 +1680,57 @@ class planController extends Controller
                     $ex2 = new exercise_private_program();
                     $ex3 = new exercise_private_program();
                     $ex4 = new exercise_private_program();
-    
+
                     $ex1->day = 5;
                     $ex1->private_program_id = $plan->private_program_id;
                     $ex1->ex_id = $day[0];
                     $ex1->reps = $day[1];
                     $ex1->sets = $day[2];
                     $ex1->duration = $day[3];
-    
+
                     $ex2 = clone $ex1;
                     $ex3 = clone $ex1;
                     $ex4 = clone $ex1;
-        
+
                     $ex2->day = 8+4;
                     $ex3->day = 15+4;
                     $ex4->day = 22+4;
-                    
+
                     $ex1->save();
                     $ex2->save();
                     $ex3->save();
                     $ex4->save();
+
+                    $Kcal += (exercise::query()->where('ex_id',$day[0])->pluck('kcal')[0]*4*$ex1->sets*$ex1->reps);
+                    $duration += (exercise::query()->where('ex_id',$day[0])->pluck('duration')[0]*240*$ex1->sets);
                 }
             }
-    
+
             if($request->day6 == NULL){
                 $ex1 = new exercise_private_program();
                 $ex2 = new exercise_private_program();
                 $ex3 = new exercise_private_program();
                 $ex4 = new exercise_private_program();
-    
+
                 $ex1->day = 6;
                 $ex1->private_program_id = $plan->private_program_id;
                 $ex1->ex_id = 189;
                 $ex1->reps = 0;
                 $ex1->sets = 0;
                 $ex1->duration = '00:00:00';
-    
+
                 $ex2 = $ex1;
                 $ex3 = $ex1;
                 $ex4 = $ex1;
-    
+
                 $ex2 = clone $ex1;
                 $ex3 = clone $ex1;
                 $ex4 = clone $ex1;
-    
+
                 $ex2->day = 8+5;
                 $ex3->day = 15+5;
                 $ex4->day = 22+5;
-    
+
                 $ex1->save();
                 $ex2->save();
                 $ex3->save();
@@ -1690,54 +1743,57 @@ class planController extends Controller
                     $ex2 = new exercise_private_program();
                     $ex3 = new exercise_private_program();
                     $ex4 = new exercise_private_program();
-    
+
                     $ex1->day = 6;
                     $ex1->private_program_id = $plan->private_program_id;
                     $ex1->ex_id = $day[0];
                     $ex1->reps = $day[1];
                     $ex1->sets = $day[2];
                     $ex1->duration = $day[3];
-    
+
                     $ex2 = clone $ex1;
                     $ex3 = clone $ex1;
                     $ex4 = clone $ex1;
-        
+
                     $ex2->day = 8+5;
                     $ex3->day = 15+5;
                     $ex4->day = 22+5;
-                    
+
                     $ex1->save();
                     $ex2->save();
                     $ex3->save();
                     $ex4->save();
+
+                    $Kcal += (exercise::query()->where('ex_id',$day[0])->pluck('kcal')[0]*4*$ex1->sets*$ex1->reps);
+                    $duration += (exercise::query()->where('ex_id',$day[0])->pluck('duration')[0]*240*$ex1->sets);
                 }
             }
-    
+
             if($request->day7 == NULL){
                 $ex1 = new exercise_private_program();
                 $ex2 = new exercise_private_program();
                 $ex3 = new exercise_private_program();
                 $ex4 = new exercise_private_program();
-    
+
                 $ex1->day = 7;
                 $ex1->private_program_id = $plan->private_program_id;
                 $ex1->ex_id = 189;
                 $ex1->reps = 0;
                 $ex1->sets = 0;
                 $ex1->duration = '00:00:00';
-    
+
                 $ex2 = $ex1;
                 $ex3 = $ex1;
                 $ex4 = $ex1;
-    
+
                 $ex2 = clone $ex1;
                 $ex3 = clone $ex1;
                 $ex4 = clone $ex1;
-    
+
                 $ex2->day = 8+6;
                 $ex3->day = 15+6;
                 $ex4->day = 22+6;
-    
+
                 $ex1->save();
                 $ex2->save();
                 $ex3->save();
@@ -1750,30 +1806,35 @@ class planController extends Controller
                     $ex2 = new exercise_private_program();
                     $ex3 = new exercise_private_program();
                     $ex4 = new exercise_private_program();
-    
+
                     $ex1->day = 7;
                     $ex1->private_program_id = $plan->private_program_id;
                     $ex1->ex_id = $day[0];
                     $ex1->reps = $day[1];
                     $ex1->sets = $day[2];
                     $ex1->duration = $day[3];
-    
+
                     $ex2 = clone $ex1;
                     $ex3 = clone $ex1;
                     $ex4 = clone $ex1;
-        
+
                     $ex2->day = 8+6;
                     $ex3->day = 15+6;
                     $ex4->day = 22+6;
-                    
+
                     $ex1->save();
                     $ex2->save();
                     $ex3->save();
                     $ex4->save();
+
+                    $Kcal += (exercise::query()->where('ex_id',$day[0])->pluck('kcal')[0]*4*$ex1->sets*$ex1->reps);
+                    $duration += (exercise::query()->where('ex_id',$day[0])->pluck('duration')[0]*240*$ex1->sets);
                 }
             }
             //insert kcal and duration calculation of private program here
-
+            $plan->duration = sprintf('%02d:%02d:%02d', ($duration/ 3600),($duration/ 60 % 60), $duration% 60);
+            $plan->Kcal = $Kcal;
+            $plan->save();
 
             $req = requests::query()->where('user_id',$plan->user_id)->where('coach_id',$coach->coach_id)->update(['status'=>'accepted']);
 
