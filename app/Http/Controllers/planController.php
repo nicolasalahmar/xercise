@@ -102,12 +102,14 @@ class planController extends Controller
             if($firstName == NULL)
             {
                 $temp['author']='Xercise';
+                $temp['type']='Default';
             }
             else
             {
                 $firstName=$firstName['firstName'];
                 $lastName=$lastName['lastName'];
                 $temp['author']=$firstName.' '.$lastName;
+                $temp['type']='By Coach';
             }
 
             array_push($a1,$temp);
@@ -122,12 +124,14 @@ class planController extends Controller
             if($firstName == NULL)
             {
                 $temp['author']='Custom Plan';
+                $temp['type']='Custom';
             }
             else
             {
                 $firstName=$firstName['firstName'];
                 $lastName=$lastName['lastName'];
                 $temp['author']=$firstName.' '.$lastName;
+                $temp['type']='Requested from Coach';
             }
 
             array_push($a2,$temp);
@@ -179,6 +183,7 @@ class planController extends Controller
             $card['plan_duration'] = $hours * 60 + (int)$minutes;
 
             //workout day
+
             $stats = workout_stats::query()->where('user_id',$user->user_id)->where('program_id',$user->active_program_id)->orderBy('created_at','desc')->first('day_num');
             if($stats == null){
                 $day=1;
