@@ -17,6 +17,7 @@ return new class extends Migration
             $table->bigIncrements('ex_id');
             $table->text('name');
             $table->float('duration');
+            $table->float('Kcal');
             $table->enum('knee',['Yes','No','A little']);
         });
     }

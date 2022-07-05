@@ -22,6 +22,7 @@ class exerciseFactory extends Factory
             'name' => $this->faker->name(),
             'knee' => $this->faker->randomElement(['Yes','No','A little']),
             'duration' => $this->faker->randomElement(['2.5','2']),
+            'Kcal' =>$this->faker->randomElement(['3','4']),
         ];
     }
 }

@@ -14,7 +14,8 @@ class exercise extends Model
     protected $fillable = [
         'name',
         'knee',
-        'duration'
+        'duration',
+        'Kcal',
     ];
 
     public $timestamps = false;
