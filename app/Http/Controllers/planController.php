@@ -839,4 +839,923 @@ class planController extends Controller
 
         return response()->json(['message'=>'done']);
     }
+
+
+    public function createPlanCoach(Request $request){
+        $coach = Auth::user();
+
+        $validator = Validator::make($request->all(),[
+            'name'=>['required','min:3','regex:/^[a-zA-Z ]+$/'],
+    		'description'=>['required','min:3','max:50','regex:/^[a-zA-Z ]+$/'],
+            'knee'=>['required','in:Yes,No,A little'],
+            'category'=>['required','in:muscle,weight,height,stretching'],
+            'username'=>['exists:users,username'],
+    	]);
+        if($validator->fails()){
+    		return $validator->errors()->all();
+    	}
+        //creating a public plan
+        if($request->username == NULL){
+            $plan = new program();
+
+            $plan->coach_id = $coach->coach_id;
+            $plan->name = $request->name;
+            $plan->description = $request->description;
+            $plan->rating = 0.0;
+            $plan->knee = $request->knee;
+            $plan->category = $request->category;
+            $plan->duration = '00:00:00';
+            $plan->kcal = 0.0;
+    
+            $plan->save();
+
+        //filling plan with exercises for each day
+        if($request->day1 == NULL){
+            $ex1 = new exercise_program();
+            $ex2 = new exercise_program();
+            $ex3 = new exercise_program();
+            $ex4 = new exercise_program();
+
+            $ex1->day = 1;
+            $ex1->program_id = $plan->program_id;
+            $ex1->ex_id = 189;
+            $ex1->reps = 0;
+            $ex1->sets = 0;
+            $ex1->duration = '00:00:00';
+
+            $ex2 = $ex1;
+            $ex3 = $ex1;
+            $ex4 = $ex1;
+
+            $ex2 = clone $ex1;
+            $ex3 = clone $ex1;
+            $ex4 = clone $ex1;
+
+            $ex2->day = 8;
+            $ex3->day = 15;
+            $ex4->day = 22;
+
+            $ex1->save();
+            $ex2->save();
+            $ex3->save();
+            $ex4->save();
+        }else{
+            $day1 = $request->day1;
+            $day1 = json_decode($day1,true);
+            foreach($day1 as $day){
+                $ex1 = new exercise_program();
+                $ex2 = new exercise_program();
+                $ex3 = new exercise_program();
+                $ex4 = new exercise_program();
+
+                $ex1->day = 1;
+                $ex1->program_id = $plan->program_id;
+                $ex1->ex_id = $day[0];
+                $ex1->reps = $day[1];
+                $ex1->sets = $day[2];
+                $ex1->duration = $day[3];
+
+                $ex2 = clone $ex1;
+                $ex3 = clone $ex1;
+                $ex4 = clone $ex1;
+
+                $ex2->day = 8;
+                $ex3->day = 15;
+                $ex4->day = 22;
+                
+                $ex1->save();
+                $ex2->save();
+                $ex3->save();
+                $ex4->save();
+            }
+        }
+
+        if($request->day2 == NULL){
+            $ex1 = new exercise_program();
+            $ex2 = new exercise_program();
+            $ex3 = new exercise_program();
+            $ex4 = new exercise_program();
+
+            $ex1->day = 2;
+            $ex1->program_id = $plan->program_id;
+            $ex1->ex_id = 189;
+            $ex1->reps = 0;
+            $ex1->sets = 0;
+            $ex1->duration = '00:00:00';
+
+            $ex2 = $ex1;
+            $ex3 = $ex1;
+            $ex4 = $ex1;
+
+            $ex2 = clone $ex1;
+            $ex3 = clone $ex1;
+            $ex4 = clone $ex1;
+
+            $ex2->day = 8+1;
+            $ex3->day = 15+1;
+            $ex4->day = 22+1;
+
+            $ex1->save();
+            $ex2->save();
+            $ex3->save();
+            $ex4->save();
+        }else{
+            $day2 = $request->day2;
+            $day2 = json_decode($day2,true);
+            foreach($day2 as $day){
+                $ex1 = new exercise_program();
+                $ex2 = new exercise_program();
+                $ex3 = new exercise_program();
+                $ex4 = new exercise_program();
+
+                $ex1->day = 2;
+                $ex1->program_id = $plan->program_id;
+                $ex1->ex_id = $day[0];
+                $ex1->reps = $day[1];
+                $ex1->sets = $day[2];
+                $ex1->duration = $day[3];
+
+                $ex2 = clone $ex1;
+                $ex3 = clone $ex1;
+                $ex4 = clone $ex1;
+    
+                $ex2->day = 8+1;
+                $ex3->day = 15+1;
+                $ex4->day = 22+1;
+                
+                $ex1->save();
+                $ex2->save();
+                $ex3->save();
+                $ex4->save();
+            }
+        }
+
+        if($request->day3 == NULL){
+            $ex1 = new exercise_program();
+            $ex2 = new exercise_program();
+            $ex3 = new exercise_program();
+            $ex4 = new exercise_program();
+
+            $ex1->day = 3;
+            $ex1->program_id = $plan->program_id;
+            $ex1->ex_id = 189;
+            $ex1->reps = 0;
+            $ex1->sets = 0;
+            $ex1->duration = '00:00:00';
+
+            $ex2 = $ex1;
+            $ex3 = $ex1;
+            $ex4 = $ex1;
+
+            $ex2 = clone $ex1;
+            $ex3 = clone $ex1;
+            $ex4 = clone $ex1;
+
+            $ex2->day = 8+2;
+            $ex3->day = 15+2;
+            $ex4->day = 22+2;
+
+            $ex1->save();
+            $ex2->save();
+            $ex3->save();
+            $ex4->save();
+        }else{
+            $day3 = $request->day3;
+            $day3 = json_decode($day3,true);
+            foreach($day3 as $day){
+                $ex1 = new exercise_program();
+                $ex2 = new exercise_program();
+                $ex3 = new exercise_program();
+                $ex4 = new exercise_program();
+
+                $ex1->day = 3;
+                $ex1->program_id = $plan->program_id;
+                $ex1->ex_id = $day[0];
+                $ex1->reps = $day[1];
+                $ex1->sets = $day[2];
+                $ex1->duration = $day[3];
+
+                $ex2 = clone $ex1;
+                $ex3 = clone $ex1;
+                $ex4 = clone $ex1;
+    
+                $ex2->day = 8+2;
+                $ex3->day = 15+2;
+                $ex4->day = 22+2;
+                
+                $ex1->save();
+                $ex2->save();
+                $ex3->save();
+                $ex4->save();
+            }
+        }
+
+        if($request->day4 == NULL){
+            $ex1 = new exercise_program();
+            $ex2 = new exercise_program();
+            $ex3 = new exercise_program();
+            $ex4 = new exercise_program();
+
+            $ex1->day = 4;
+            $ex1->program_id = $plan->program_id;
+            $ex1->ex_id = 189;
+            $ex1->reps = 0;
+            $ex1->sets = 0;
+            $ex1->duration = '00:00:00';
+
+            $ex2 = $ex1;
+            $ex3 = $ex1;
+            $ex4 = $ex1;
+
+            $ex2 = clone $ex1;
+            $ex3 = clone $ex1;
+            $ex4 = clone $ex1;
+
+            $ex2->day = 8+3;
+            $ex3->day = 15+3;
+            $ex4->day = 22+3;
+
+            $ex1->save();
+            $ex2->save();
+            $ex3->save();
+            $ex4->save();
+        }else{
+            $day4 = $request->day4;
+            $day4 = json_decode($day4,true);
+            foreach($day4 as $day){
+                $ex1 = new exercise_program();
+                $ex2 = new exercise_program();
+                $ex3 = new exercise_program();
+                $ex4 = new exercise_program();
+
+                $ex1->day = 4;
+                $ex1->program_id = $plan->program_id;
+                $ex1->ex_id = $day[0];
+                $ex1->reps = $day[1];
+                $ex1->sets = $day[2];
+                $ex1->duration = $day[3];
+
+                $ex2 = clone $ex1;
+                $ex3 = clone $ex1;
+                $ex4 = clone $ex1;
+    
+                $ex2->day = 8+3;
+                $ex3->day = 15+3;
+                $ex4->day = 22+3;
+                
+                $ex1->save();
+                $ex2->save();
+                $ex3->save();
+                $ex4->save();
+            }
+        }
+
+        if($request->day5 == NULL){
+            $ex1 = new exercise_program();
+            $ex2 = new exercise_program();
+            $ex3 = new exercise_program();
+            $ex4 = new exercise_program();
+
+            $ex1->day = 5;
+            $ex1->program_id = $plan->program_id;
+            $ex1->ex_id = 189;
+            $ex1->reps = 0;
+            $ex1->sets = 0;
+            $ex1->duration = '00:00:00';
+
+            $ex2 = $ex1;
+            $ex3 = $ex1;
+            $ex4 = $ex1;
+
+            $ex2 = clone $ex1;
+            $ex3 = clone $ex1;
+            $ex4 = clone $ex1;
+
+            $ex2->day = 8+4;
+            $ex3->day = 15+4;
+            $ex4->day = 22+4;
+
+            $ex1->save();
+            $ex2->save();
+            $ex3->save();
+            $ex4->save();
+        }else{
+            $day5 = $request->day5;
+            $day5 = json_decode($day5,true);
+            foreach($day5 as $day){
+                $ex1 = new exercise_program();
+                $ex2 = new exercise_program();
+                $ex3 = new exercise_program();
+                $ex4 = new exercise_program();
+
+                $ex1->day = 5;
+                $ex1->program_id = $plan->program_id;
+                $ex1->ex_id = $day[0];
+                $ex1->reps = $day[1];
+                $ex1->sets = $day[2];
+                $ex1->duration = $day[3];
+
+                $ex2 = clone $ex1;
+                $ex3 = clone $ex1;
+                $ex4 = clone $ex1;
+    
+                $ex2->day = 8+4;
+                $ex3->day = 15+4;
+                $ex4->day = 22+4;
+                
+                $ex1->save();
+                $ex2->save();
+                $ex3->save();
+                $ex4->save();
+            }
+        }
+
+        if($request->day6 == NULL){
+            $ex1 = new exercise_program();
+            $ex2 = new exercise_program();
+            $ex3 = new exercise_program();
+            $ex4 = new exercise_program();
+
+            $ex1->day = 6;
+            $ex1->program_id = $plan->program_id;
+            $ex1->ex_id = 189;
+            $ex1->reps = 0;
+            $ex1->sets = 0;
+            $ex1->duration = '00:00:00';
+
+            $ex2 = $ex1;
+            $ex3 = $ex1;
+            $ex4 = $ex1;
+
+            $ex2 = clone $ex1;
+            $ex3 = clone $ex1;
+            $ex4 = clone $ex1;
+
+            $ex2->day = 8+5;
+            $ex3->day = 15+5;
+            $ex4->day = 22+5;
+
+            $ex1->save();
+            $ex2->save();
+            $ex3->save();
+            $ex4->save();
+        }else{
+            $day6 = $request->day6;
+            $day6 = json_decode($day6,true);
+            foreach($day6 as $day){
+                $ex1 = new exercise_program();
+                $ex2 = new exercise_program();
+                $ex3 = new exercise_program();
+                $ex4 = new exercise_program();
+
+                $ex1->day = 6;
+                $ex1->program_id = $plan->program_id;
+                $ex1->ex_id = $day[0];
+                $ex1->reps = $day[1];
+                $ex1->sets = $day[2];
+                $ex1->duration = $day[3];
+
+                $ex2 = clone $ex1;
+                $ex3 = clone $ex1;
+                $ex4 = clone $ex1;
+    
+                $ex2->day = 8+5;
+                $ex3->day = 15+5;
+                $ex4->day = 22+5;
+                
+                $ex1->save();
+                $ex2->save();
+                $ex3->save();
+                $ex4->save();
+            }
+        }
+
+        if($request->day7 == NULL){
+            $ex1 = new exercise_program();
+            $ex2 = new exercise_program();
+            $ex3 = new exercise_program();
+            $ex4 = new exercise_program();
+
+            $ex1->day = 7;
+            $ex1->program_id = $plan->program_id;
+            $ex1->ex_id = 189;
+            $ex1->reps = 0;
+            $ex1->sets = 0;
+            $ex1->duration = '00:00:00';
+
+            $ex2 = $ex1;
+            $ex3 = $ex1;
+            $ex4 = $ex1;
+
+            $ex2 = clone $ex1;
+            $ex3 = clone $ex1;
+            $ex4 = clone $ex1;
+
+            $ex2->day = 8+6;
+            $ex3->day = 15+6;
+            $ex4->day = 22+6;
+
+            $ex1->save();
+            $ex2->save();
+            $ex3->save();
+            $ex4->save();
+        }else{
+            $day7 = $request->day7;
+            $day7 = json_decode($day7,true);
+            foreach($day7 as $day){
+                $ex1 = new exercise_program();
+                $ex2 = new exercise_program();
+                $ex3 = new exercise_program();
+                $ex4 = new exercise_program();
+
+                $ex1->day = 7;
+                $ex1->program_id = $plan->program_id;
+                $ex1->ex_id = $day[0];
+                $ex1->reps = $day[1];
+                $ex1->sets = $day[2];
+                $ex1->duration = $day[3];
+
+                $ex2 = clone $ex1;
+                $ex3 = clone $ex1;
+                $ex4 = clone $ex1;
+    
+                $ex2->day = 8+6;
+                $ex3->day = 15+6;
+                $ex4->day = 22+6;
+                
+                $ex1->save();
+                $ex2->save();
+                $ex3->save();
+                $ex4->save();
+            }
+        }
+
+        //insret calculated kcal and duration here for public program
+
+        return response()->json(['message'=>'done']);
+        }
+
+
+
+
+        if($request->username !=NULL ){
+            
+
+            $user_id = user::query()->where('username', $request->username)->pluck('user_id');
+            $requested = requests::query()->where('user_id',$user_id[0])->where('coach_id',$coach->coach_id)->get();
+
+            if(count($requested)>0){
+            
+            $plan = new private_program();
+            $plan->user_id = $user_id[0];
+            $plan->coach_id = $coach->coach_id;
+            $plan->name = $request->name;
+            $plan->description = $request->description;
+    
+            $plan->duration = '00:00:00';
+            $plan->kcal = 0.0;
+    
+            $plan->save();
+    
+    
+            //enrolling user to plan in private enrolls table
+            $enroll = new private_enroll();
+            $enroll->user_id = $plan->user_id;
+            $enroll->private_program_id = $plan->private_program_id;
+    
+            $enroll->save();
+    
+            //filling plan with exercises for each day
+            if($request->day1 == NULL){
+                $ex1 = new exercise_private_program();
+                $ex2 = new exercise_private_program();
+                $ex3 = new exercise_private_program();
+                $ex4 = new exercise_private_program();
+    
+                $ex1->day = 1;
+                $ex1->private_program_id = $plan->private_program_id;
+                $ex1->ex_id = 189;
+                $ex1->reps = 0;
+                $ex1->sets = 0;
+                $ex1->duration = '00:00:00';
+    
+                $ex2 = $ex1;
+                $ex3 = $ex1;
+                $ex4 = $ex1;
+    
+                $ex2 = clone $ex1;
+                $ex3 = clone $ex1;
+                $ex4 = clone $ex1;
+    
+                $ex2->day = 8;
+                $ex3->day = 15;
+                $ex4->day = 22;
+    
+                $ex1->save();
+                $ex2->save();
+                $ex3->save();
+                $ex4->save();
+            }else{
+                $day1 = $request->day1;
+                $day1 = json_decode($day1,true);
+                foreach($day1 as $day){
+                    $ex1 = new exercise_private_program();
+                    $ex2 = new exercise_private_program();
+                    $ex3 = new exercise_private_program();
+                    $ex4 = new exercise_private_program();
+    
+                    $ex1->day = 1;
+                    $ex1->private_program_id = $plan->private_program_id;
+                    $ex1->ex_id = $day[0];
+                    $ex1->reps = $day[1];
+                    $ex1->sets = $day[2];
+                    $ex1->duration = $day[3];
+    
+                    $ex2 = clone $ex1;
+                    $ex3 = clone $ex1;
+                    $ex4 = clone $ex1;
+    
+                    $ex2->day = 8;
+                    $ex3->day = 15;
+                    $ex4->day = 22;
+                    
+                    $ex1->save();
+                    $ex2->save();
+                    $ex3->save();
+                    $ex4->save();
+                }
+            }
+    
+            if($request->day2 == NULL){
+                $ex1 = new exercise_private_program();
+                $ex2 = new exercise_private_program();
+                $ex3 = new exercise_private_program();
+                $ex4 = new exercise_private_program();
+    
+                $ex1->day = 2;
+                $ex1->private_program_id = $plan->private_program_id;
+                $ex1->ex_id = 189;
+                $ex1->reps = 0;
+                $ex1->sets = 0;
+                $ex1->duration = '00:00:00';
+    
+                $ex2 = $ex1;
+                $ex3 = $ex1;
+                $ex4 = $ex1;
+    
+                $ex2 = clone $ex1;
+                $ex3 = clone $ex1;
+                $ex4 = clone $ex1;
+    
+                $ex2->day = 8+1;
+                $ex3->day = 15+1;
+                $ex4->day = 22+1;
+    
+                $ex1->save();
+                $ex2->save();
+                $ex3->save();
+                $ex4->save();
+            }else{
+                $day2 = $request->day2;
+                $day2 = json_decode($day2,true);
+                foreach($day2 as $day){
+                    $ex1 = new exercise_private_program();
+                    $ex2 = new exercise_private_program();
+                    $ex3 = new exercise_private_program();
+                    $ex4 = new exercise_private_program();
+    
+                    $ex1->day = 2;
+                    $ex1->private_program_id = $plan->private_program_id;
+                    $ex1->ex_id = $day[0];
+                    $ex1->reps = $day[1];
+                    $ex1->sets = $day[2];
+                    $ex1->duration = $day[3];
+    
+                    $ex2 = clone $ex1;
+                    $ex3 = clone $ex1;
+                    $ex4 = clone $ex1;
+        
+                    $ex2->day = 8+1;
+                    $ex3->day = 15+1;
+                    $ex4->day = 22+1;
+                    
+                    $ex1->save();
+                    $ex2->save();
+                    $ex3->save();
+                    $ex4->save();
+                }
+            }
+    
+            if($request->day3 == NULL){
+                $ex1 = new exercise_private_program();
+                $ex2 = new exercise_private_program();
+                $ex3 = new exercise_private_program();
+                $ex4 = new exercise_private_program();
+    
+                $ex1->day = 3;
+                $ex1->private_program_id = $plan->private_program_id;
+                $ex1->ex_id = 189;
+                $ex1->reps = 0;
+                $ex1->sets = 0;
+                $ex1->duration = '00:00:00';
+    
+                $ex2 = $ex1;
+                $ex3 = $ex1;
+                $ex4 = $ex1;
+    
+                $ex2 = clone $ex1;
+                $ex3 = clone $ex1;
+                $ex4 = clone $ex1;
+    
+                $ex2->day = 8+2;
+                $ex3->day = 15+2;
+                $ex4->day = 22+2;
+    
+                $ex1->save();
+                $ex2->save();
+                $ex3->save();
+                $ex4->save();
+            }else{
+                $day3 = $request->day3;
+                $day3 = json_decode($day3,true);
+                foreach($day3 as $day){
+                    $ex1 = new exercise_private_program();
+                    $ex2 = new exercise_private_program();
+                    $ex3 = new exercise_private_program();
+                    $ex4 = new exercise_private_program();
+    
+                    $ex1->day = 3;
+                    $ex1->private_program_id = $plan->private_program_id;
+                    $ex1->ex_id = $day[0];
+                    $ex1->reps = $day[1];
+                    $ex1->sets = $day[2];
+                    $ex1->duration = $day[3];
+    
+                    $ex2 = clone $ex1;
+                    $ex3 = clone $ex1;
+                    $ex4 = clone $ex1;
+        
+                    $ex2->day = 8+2;
+                    $ex3->day = 15+2;
+                    $ex4->day = 22+2;
+                    
+                    $ex1->save();
+                    $ex2->save();
+                    $ex3->save();
+                    $ex4->save();
+                }
+            }
+    
+            if($request->day4 == NULL){
+                $ex1 = new exercise_private_program();
+                $ex2 = new exercise_private_program();
+                $ex3 = new exercise_private_program();
+                $ex4 = new exercise_private_program();
+    
+                $ex1->day = 4;
+                $ex1->private_program_id = $plan->private_program_id;
+                $ex1->ex_id = 189;
+                $ex1->reps = 0;
+                $ex1->sets = 0;
+                $ex1->duration = '00:00:00';
+    
+                $ex2 = $ex1;
+                $ex3 = $ex1;
+                $ex4 = $ex1;
+    
+                $ex2 = clone $ex1;
+                $ex3 = clone $ex1;
+                $ex4 = clone $ex1;
+    
+                $ex2->day = 8+3;
+                $ex3->day = 15+3;
+                $ex4->day = 22+3;
+    
+                $ex1->save();
+                $ex2->save();
+                $ex3->save();
+                $ex4->save();
+            }else{
+                $day4 = $request->day4;
+                $day4 = json_decode($day4,true);
+                foreach($day4 as $day){
+                    $ex1 = new exercise_private_program();
+                    $ex2 = new exercise_private_program();
+                    $ex3 = new exercise_private_program();
+                    $ex4 = new exercise_private_program();
+    
+                    $ex1->day = 4;
+                    $ex1->private_program_id = $plan->private_program_id;
+                    $ex1->ex_id = $day[0];
+                    $ex1->reps = $day[1];
+                    $ex1->sets = $day[2];
+                    $ex1->duration = $day[3];
+    
+                    $ex2 = clone $ex1;
+                    $ex3 = clone $ex1;
+                    $ex4 = clone $ex1;
+        
+                    $ex2->day = 8+3;
+                    $ex3->day = 15+3;
+                    $ex4->day = 22+3;
+                    
+                    $ex1->save();
+                    $ex2->save();
+                    $ex3->save();
+                    $ex4->save();
+                }
+            }
+    
+            if($request->day5 == NULL){
+                $ex1 = new exercise_private_program();
+                $ex2 = new exercise_private_program();
+                $ex3 = new exercise_private_program();
+                $ex4 = new exercise_private_program();
+    
+                $ex1->day = 5;
+                $ex1->private_program_id = $plan->private_program_id;
+                $ex1->ex_id = 189;
+                $ex1->reps = 0;
+                $ex1->sets = 0;
+                $ex1->duration = '00:00:00';
+    
+                $ex2 = $ex1;
+                $ex3 = $ex1;
+                $ex4 = $ex1;
+    
+                $ex2 = clone $ex1;
+                $ex3 = clone $ex1;
+                $ex4 = clone $ex1;
+    
+                $ex2->day = 8+4;
+                $ex3->day = 15+4;
+                $ex4->day = 22+4;
+    
+                $ex1->save();
+                $ex2->save();
+                $ex3->save();
+                $ex4->save();
+            }else{
+                $day5 = $request->day5;
+                $day5 = json_decode($day5,true);
+                foreach($day5 as $day){
+                    $ex1 = new exercise_private_program();
+                    $ex2 = new exercise_private_program();
+                    $ex3 = new exercise_private_program();
+                    $ex4 = new exercise_private_program();
+    
+                    $ex1->day = 5;
+                    $ex1->private_program_id = $plan->private_program_id;
+                    $ex1->ex_id = $day[0];
+                    $ex1->reps = $day[1];
+                    $ex1->sets = $day[2];
+                    $ex1->duration = $day[3];
+    
+                    $ex2 = clone $ex1;
+                    $ex3 = clone $ex1;
+                    $ex4 = clone $ex1;
+        
+                    $ex2->day = 8+4;
+                    $ex3->day = 15+4;
+                    $ex4->day = 22+4;
+                    
+                    $ex1->save();
+                    $ex2->save();
+                    $ex3->save();
+                    $ex4->save();
+                }
+            }
+    
+            if($request->day6 == NULL){
+                $ex1 = new exercise_private_program();
+                $ex2 = new exercise_private_program();
+                $ex3 = new exercise_private_program();
+                $ex4 = new exercise_private_program();
+    
+                $ex1->day = 6;
+                $ex1->private_program_id = $plan->private_program_id;
+                $ex1->ex_id = 189;
+                $ex1->reps = 0;
+                $ex1->sets = 0;
+                $ex1->duration = '00:00:00';
+    
+                $ex2 = $ex1;
+                $ex3 = $ex1;
+                $ex4 = $ex1;
+    
+                $ex2 = clone $ex1;
+                $ex3 = clone $ex1;
+                $ex4 = clone $ex1;
+    
+                $ex2->day = 8+5;
+                $ex3->day = 15+5;
+                $ex4->day = 22+5;
+    
+                $ex1->save();
+                $ex2->save();
+                $ex3->save();
+                $ex4->save();
+            }else{
+                $day6 = $request->day6;
+                $day6 = json_decode($day6,true);
+                foreach($day6 as $day){
+                    $ex1 = new exercise_private_program();
+                    $ex2 = new exercise_private_program();
+                    $ex3 = new exercise_private_program();
+                    $ex4 = new exercise_private_program();
+    
+                    $ex1->day = 6;
+                    $ex1->private_program_id = $plan->private_program_id;
+                    $ex1->ex_id = $day[0];
+                    $ex1->reps = $day[1];
+                    $ex1->sets = $day[2];
+                    $ex1->duration = $day[3];
+    
+                    $ex2 = clone $ex1;
+                    $ex3 = clone $ex1;
+                    $ex4 = clone $ex1;
+        
+                    $ex2->day = 8+5;
+                    $ex3->day = 15+5;
+                    $ex4->day = 22+5;
+                    
+                    $ex1->save();
+                    $ex2->save();
+                    $ex3->save();
+                    $ex4->save();
+                }
+            }
+    
+            if($request->day7 == NULL){
+                $ex1 = new exercise_private_program();
+                $ex2 = new exercise_private_program();
+                $ex3 = new exercise_private_program();
+                $ex4 = new exercise_private_program();
+    
+                $ex1->day = 7;
+                $ex1->private_program_id = $plan->private_program_id;
+                $ex1->ex_id = 189;
+                $ex1->reps = 0;
+                $ex1->sets = 0;
+                $ex1->duration = '00:00:00';
+    
+                $ex2 = $ex1;
+                $ex3 = $ex1;
+                $ex4 = $ex1;
+    
+                $ex2 = clone $ex1;
+                $ex3 = clone $ex1;
+                $ex4 = clone $ex1;
+    
+                $ex2->day = 8+6;
+                $ex3->day = 15+6;
+                $ex4->day = 22+6;
+    
+                $ex1->save();
+                $ex2->save();
+                $ex3->save();
+                $ex4->save();
+            }else{
+                $day7 = $request->day7;
+                $day7 = json_decode($day7,true);
+                foreach($day7 as $day){
+                    $ex1 = new exercise_private_program();
+                    $ex2 = new exercise_private_program();
+                    $ex3 = new exercise_private_program();
+                    $ex4 = new exercise_private_program();
+    
+                    $ex1->day = 7;
+                    $ex1->private_program_id = $plan->private_program_id;
+                    $ex1->ex_id = $day[0];
+                    $ex1->reps = $day[1];
+                    $ex1->sets = $day[2];
+                    $ex1->duration = $day[3];
+    
+                    $ex2 = clone $ex1;
+                    $ex3 = clone $ex1;
+                    $ex4 = clone $ex1;
+        
+                    $ex2->day = 8+6;
+                    $ex3->day = 15+6;
+                    $ex4->day = 22+6;
+                    
+                    $ex1->save();
+                    $ex2->save();
+                    $ex3->save();
+                    $ex4->save();
+                }
+            }
+            //insert kcal and duration calculation of private program here
+
+
+            $req = requests::query()->where('user_id',$plan->user_id)->where('coach_id',$coach->coach_id)->update(['status'=>'accepted']);
+
+            return response()->json(['message'=>'done']);
+        }else{
+            return response()->json(['message'=>'this user did not request a plan']);
+        }
+
+    }
+
+    }
 }
