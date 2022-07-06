@@ -10,7 +10,6 @@ use App\Models\coach;
 use App\Models\workout_stats;
 use App\Models\body_stats;
 use App\Models\rating_coach;
-use App\Models\requests;
 use App\Models\enroll;
 use App\Models\private_enroll;
 use App\Models\program;
@@ -115,7 +114,7 @@ class userController extends Controller
         }
 
         if (rating_coach::query()->where('user_id',$user->user_id)->where('coach_id',$coach_id)->exists()){
-            rating_coach::where('user_id',$user->user_id)->where('coach_id',$coach_id)->update(['rating'=>$request->rating]);
+            rating_coach::query()->where('user_id',$user->user_id)->where('coach_id',$coach_id)->update(['rating'=>$request->rating]);
         }
         else{
             $rate = new rating_coach();
@@ -137,7 +136,7 @@ class userController extends Controller
 
         coach::query()->where('coach_id',$coach_id)->update(['rating'=>$avg]);
 
-        return response()->json(["success"=>true, "message"=>"Rated coach successfuly."]);
+        return response()->json(["success"=>true, "message"=>"Rated coach successfully."]);
     }
 
     public function ratePlan(Request $request){
@@ -227,6 +226,9 @@ class userController extends Controller
         if($request->has('private_program_id')){
             $req = private_enroll::query()->where('user_id', $user->user_id)->where('private_program_id',$request->private_program_id)->delete();
             return response()->json( ['success'=>$req]);
+        }
+        else{
+            return response()->json( ['success'=>false,'message'=>'bad request'],400);
         }
     }
 
