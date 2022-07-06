@@ -8,6 +8,8 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use App\Models\user;
 use App\Models\coach;
+use App\Models\enroll;
+use App\Models\body_stats;
 use Illuminate\Auth\AuthenticationException;
 use App\Models\constants;
 
@@ -113,6 +115,15 @@ class AuthController extends Controller
         $temp->weight = $weight;
         $temp->date = date('y-m-d');
         $temp->save();
+
+        app('App\Http\Controllers\planController')->enrollInDefaultPlan($user->initial_plan,$user);
+        //get all plans this user is enrolled in (it should be only one plan that we created right now)
+        $temp = enroll::query()->where('user_id',$user->user_id)->get('program_id');
+        $count = count($temp);
+        if($count ==1){
+            $user->active_program_id = $temp[0]['program_id'];
+            $user->save();
+        }
 
         if($user->user_id){
             if($request->has('encodedImage'))
