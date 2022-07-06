@@ -1880,7 +1880,78 @@ class planController extends Controller
             return response()->json(['message'=>'this user did not request a plan']);
         }
 
+        }
+
     }
 
+    public function defaultPlanPicker($category,$user){
+        $difficulty = $this->userDifficulty($user->plank,$user->pushups);
+        $times_a_week = $user->times_a_week;
+        $time_per_day = $user->time_per_day;
+        $time_per_day = ($time_per_day - 10)/5 + 1;
+        $category = $this->category($category);
+
+        $c = ($category-1)*105;
+        $d = ($difficulty-1)*35;
+        $w = ($times_a_week-1)*7;
+        $t = $time_per_day;
+
+        $result = $c + $d + $w + $t;
+        return $result;
+    }
+
+    public function userDifficulty($plank,$pushups){
+        $array=array('0-5'=>1,'5-10'=>2,'10-20'=>3,'20-30'=>4,'35+'=>5);
+
+        if(!in_array($plank,array(1,2,3,4,5)))
+            $plank = $array[$plank];
+
+        if(!in_array($pushups,array(1,2,3,4,5)))
+            $pushups = $array[$pushups];
+
+        $avg = $average = array_sum(array($pushups,$plank))/2;
+        $avg = floor($avg);
+        if($avg == 1){
+            $avg = 1;
+        }
+        if($avg == 2){
+            $avg = 2;
+        }
+        if($avg == 3){
+            $avg = 2;
+        }
+        if($avg == 4){
+            $avg = 3;
+        }
+        if($avg == 5){
+            $avg = 3;
+        }
+        return $avg;
+    }
+
+    public function enrollInDefaultPlan($category,$user){
+        $enroll = new enroll();
+        $user_id=$user->user_id;
+        $enroll->user_id = $user_id;
+        $program_id = $this->defaultPlanPicker($category,$user);
+        $enroll->program_id = $program_id;
+
+        if(enroll::query()->where('program_id',$program_id)->where('user_id',$user_id)->exists()){
+            return response()->json(['success'=>false,'message'=>'user is already enrolled in this plan.']);
+        }
+        else{
+            return response()->json(['success'=>$enroll->save()]);
+        }
+    }
+
+    public function addDefaultPlan(Request $request){
+        $user = Auth::user();
+        return $this->enrollInDefaultPlan($request->category,$user);
+    }
+
+    public function category($category){
+        $category = strtolower($category);
+        $array=array('muscle fitness'=>1,'weight loss'=>2,'height increase'=>3,'stretching'=>4);
+        return $array[$category];
     }
 }
