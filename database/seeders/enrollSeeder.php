@@ -27,6 +27,7 @@ class enrollSeeder extends Seeder
     );
     public function run()
     {
+        user::factory()->create(['username'=>'Devyn Homenick','email'=>'lonny.kuphal@example.net']);
         user::factory()->count(10)->create();
 
 

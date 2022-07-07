@@ -14,3 +14,4 @@ yarn-error.log
 /.vscode
 .env.example
 /app/Models/constants.php
+/requests/
