@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\user;
+use App\Models\coach;
 use App\Models\program;
 use App\Models\enroll;
 use App\Models\exercise;
@@ -28,6 +29,7 @@ class enrollSeeder extends Seeder
     public function run()
     {
         user::factory()->create(['username'=>'Devyn Homenick','email'=>'lonny.kuphal@example.net']);
+        coach::factory()->create(['username'=>'kevon.reichel','email'=>'weber.donnie@example.net']);
         user::factory()->count(10)->create();
 
 

@@ -32,6 +32,9 @@ class requestController extends Controller
         $user = Auth::user(); //returns token's owner (user who owns the token)
         $id = request()->query('request_id');   //in request details in frontend add coach name/time of creation/delete status
         $req = requests::query()->where('request_id',$id)->first(); //delete second where
+        if($req == null){
+            return response()->json(['success'=>false,'message'=>'no request goes by this id.']);
+        }
         $coach_firstname = coach::query()->where('coach_id',$req->coach_id)->first('FirstName');
         $coach_lastname = coach::query()->where('coach_id',$req->coach_id)->first('LastName');
         $req['coach_firstname'] = $coach_firstname['FirstName'];
