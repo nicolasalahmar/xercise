@@ -59,6 +59,9 @@ class requestController extends Controller
         $user = Auth::user();
         $id = request()->query('request_id');
         $req = requests::query()->where('request_id',$id)->first();
+        if($req == null){
+            return response()->json( ['success'=>false,'message'=>'no request goes by this id.']);
+        }
         return response()->json( ['success'=>$req->delete()]);
     }
 
