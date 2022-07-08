@@ -27,17 +27,23 @@ use Carbon\Carbon;
 
 class planController extends Controller
 {
-    public function activatePlan(Request $request){
+    public function activatePlan(Request $request){     //TODO maybe the user is not enrolled in the plan in the first place
         $user = Auth::user();
         if($request->has('program_id')){
-            $user->active_program_id = $request->program_id;
+            if(program::query()->where('program_id',$request->program_id)->exists())
+                $user->active_program_id = $request->program_id;
+            else
+                return response()->json(['success'=>false,'message'=>"there is no program by this id."]);
             $user->active_private_program_id= null;
             $user->save();
             return response()->json(['success' => true,'message' => 'program activated.']);
         }
         else if($request->has('private_program_id')){
             $user->active_program_id = null;
-            $user->active_private_program_id = $request->private_program_id;
+            if(private_program::query()->where('private_program_id',$request->private_program_id)->exists())
+                $user->active_private_program_id = $request->private_program_id;
+            else
+                return response()->json(['success'=>false,'message'=>"there is no program by this id."]);
             $user->save();
             return response()->json(['success' => true,'message' => 'private program activated.']);
         }
@@ -67,21 +73,24 @@ class planController extends Controller
 
         foreach($plans as $plan){
             $temp = private_program::where('private_program_id', $plan['private_program_id'])->first();
-            //time per day and times a week must be added to programs table
+            $temp['duration'] = explode(':',$temp['duration']);
+            $temp['duration'] = ($temp['duration'][0]*60) + ($temp['duration'][1]) + ($temp['duration'][2]/60);
+            $temp['duration'] = ceil($temp['duration']);
             array_push($arr,$temp);
         }
         return response()->json($arr);
     }
+
     public function resetPlanProgress(Request $request){
         $user = Auth::user();
         if($request->has('program_id')){
-           return response()->json(['message'=> workout_stats::query()->where('user_id',$user->user_id)->where('program_id',$request->program_id)->delete()]);
+           return response()->json(['success'=>true,'message'=> workout_stats::query()->where('user_id',$user->user_id)->where('program_id',$request->program_id)->delete()]);
         }
         elseif($request->has('private_program_id')){
-            return response()->json(['message'=> workout_stats::query()->where('user_id',$user->user_id)->where('private_program_id',$request->private_program_id)->delete()]);
+            return response()->json(['success'=>true,'message'=> workout_stats::query()->where('user_id',$user->user_id)->where('private_program_id',$request->private_program_id)->delete()]);
         }
         else{
-            return response()->json(['message'=>'no program_id or private_program_id provided']);
+            return response()->json(['message'=>'no program_id or private_program_id provided'],400);
         }
     }
 
@@ -310,6 +319,7 @@ class planController extends Controller
 
 
     public function currentWorkoutDetails(Request $request){
+        //Note: the duration is mostly null in here because this is the duration put by the coach and it will mostly be reps and sets instead of duration
         $user = Auth::user();
         $details['day'] = 'Day '.$request->day;
 
@@ -430,6 +440,7 @@ class planController extends Controller
     }
 
     public function createCustomPlan(Request $request){
+        //TODO jsondecode is causing problems with http requests we may have to remove it when combining with hrayr
         $user = Auth::user();
 
         $validator = Validator::make($request->all(),[
@@ -913,8 +924,9 @@ class planController extends Controller
         return response()->json(['message'=>'done']);
     }
 
-
     public function createPlanCoach(Request $request){
+        //TODO should we use the fact that we know the first day of the week to start the program
+        //TODO jsondecode is causing problems with http requests we may have to remove it when combining with hrayr
         $coach = Auth::user();
 
         $validator = Validator::make($request->all(),[
@@ -1458,6 +1470,7 @@ class planController extends Controller
                 $ex3->save();
                 $ex4->save();
             }else{
+                //TODO jsondecode is causing problems with http requests we may have to remove it when combining with hrayr
                 $day1 = $request->day1;
                 $day1 = json_decode($day1,true);
                 foreach($day1 as $day){

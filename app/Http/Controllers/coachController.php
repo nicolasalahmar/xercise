@@ -93,7 +93,7 @@ class coachController extends Controller
         $coach = Auth::user();
         if($request->has('program_id')){
             $req = program::query()->where('program_id', $request->program_id)->where('coach_id',$coach->coach_id)->delete();
-            return response()->json( ['success'=>$req]);
+            return response()->json( ['success'=>(boolean)$req]);
         }
     }
 

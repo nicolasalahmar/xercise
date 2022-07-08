@@ -112,6 +112,9 @@ class requestController extends Controller
         $coach = Auth::user();
         $id = request()->query('request_id');
         $req = requests::query()->where('request_id',$id)->where('coach_id',$coach->coach_id)->first();
+        if($req == null){
+            return response()->json(['success'=>false,'message'=>'no request goes by this id.']);
+        }
         return response()->json( ['success'=>$req->update(['status'=>'rejected'])]);
         //delete request from coaches menu when he declines it (remind frontend to do this)
     }
@@ -120,6 +123,9 @@ class requestController extends Controller
         $coach = Auth::user(); //returns token's owner (user who owns the token)
         $id = request()->query('request_id');
         $req = requests::query()->where('request_id',$id)->where('coach_id',$coach->coach_id)->first();
+        if($req == null){
+            return response()->json(['success'=>false,'message'=>'no request goes by this id.']);
+        }
         $user = user::query()->where('user_id',$req->user_id)->first();
         $req['user'] = $user;
         return response()->json($req);
