@@ -61,7 +61,7 @@ class planController extends Controller
         }
         if($request->has('private_program_id')){
             $req = private_enroll::query()->where('user_id', $user->user_id)->where('private_program_id',$request->private_program_id)->delete();
-            return response()->json( ['success'=>$req]);
+            return response()->json( ['success'=>(boolean)$req]);
         }
     }
 
@@ -927,6 +927,7 @@ class planController extends Controller
     public function createPlanCoach(Request $request){
         //TODO should we use the fact that we know the first day of the week to start the program
         //TODO jsondecode is causing problems with http requests we may have to remove it when combining with hrayr
+        //TODO username should be capable of being null
         $coach = Auth::user();
 
         $validator = Validator::make($request->all(),[

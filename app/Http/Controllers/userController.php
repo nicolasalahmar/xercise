@@ -27,8 +27,8 @@ class userController extends Controller
 
     public function saveImage($usr_id,$encodedImage){
         $path = constants::image_path;
-        $imageName = 'user_'.($usr_id).'.jpg';
-        $path = ($path).'user_'.($usr_id).'.jpg';
+        $imageName = 'users_'.($usr_id).'.jpg';
+        $path = ($path).'users_'.($usr_id).'.jpg';
         $encodedImage = base64_decode($encodedImage);
         if(!gettype(file_put_contents(($path),$encodedImage)))
         {
@@ -322,7 +322,7 @@ class userController extends Controller
     }
 
     public function searchCoach($search){
-        $coach = DB::select('select coach_id,FirstName,LastName,rating,programs from coaches where CONCAT(FirstName ," ",LastName) like "%'.$search.'%" limit 10');
+        $coach = DB::select('select coach_id,FirstName,LastName,rating,programs,image from coaches where CONCAT(FirstName ," ",LastName) like "%'.$search.'%" limit 10');
         return $coach;
     }
 
@@ -350,7 +350,7 @@ class userController extends Controller
         $coach['plans'] = program::query()->where('coach_id',$request->coach_id)->get();
         $coach['rating'] = rating_coach::query()->where('coach_id',$request->coach_id)->where('user_id',$user->user_id)->first();
         if($coach['rating'] != null){
-            $coach['rating'] = $coach['rating']['rating'];
+            $coach['rating'] = (int)$coach['rating']['rating'];
         }
         return response()->json($coach);
     }

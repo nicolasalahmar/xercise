@@ -21,8 +21,8 @@ class coachController extends Controller
 
     public function saveImage($usr_id,$encodedImage){
         $path = constants::image_path;
-        $imageName = 'user_'.($usr_id).'.jpg';
-        $path = ($path).'user_'.($usr_id).'.jpg';
+        $imageName = 'coaches_'.($usr_id).'.jpg';
+        $path = ($path).'coaches_'.($usr_id).'.jpg';
         $encodedImage = base64_decode($encodedImage);
         if(!gettype(file_put_contents(($path),$encodedImage)))
         {
@@ -97,7 +97,6 @@ class coachController extends Controller
         }
     }
 
-
     public function viewPlans(){
         $coach = Auth::user();
         $plans = program::query()->where('coach_id', $coach->coach_id)->get('program_id');
@@ -105,7 +104,7 @@ class coachController extends Controller
 
         foreach($plans as $plan){
             $temp = program::where('program_id', $plan['program_id'])->first();
-            //time per day and times a week must be added to programs table
+            //TODO time per day and times a week must be added to programs table (make them text)
             array_push($arr,$temp);
         }
         return response()->json($arr);
