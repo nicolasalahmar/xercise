@@ -72,6 +72,15 @@ class planController extends Controller
 
         foreach($plans as $plan){
             $temp = private_program::where('private_program_id', $plan['private_program_id'])->first();
+
+            if($user->active_private_program_id == $temp['private_program_id'])
+            {
+                $temp['active'] = true;
+            }
+            else{
+                $temp['active']=false;
+            }
+
             $temp['duration'] = explode(':',$temp['duration']);
             $temp['duration'] = ($temp['duration'][0]*60) + ($temp['duration'][1]) + ($temp['duration'][2]/60);
             $temp['duration'] = ceil($temp['duration']);
@@ -107,6 +116,14 @@ class planController extends Controller
             $firstName=coach::where('coach_id', $temp['coach_id'])->first('firstName');
             $lastName=coach::where('coach_id', $temp['coach_id'])->first('lastName');
 
+            if($user->active_program_id == $temp['program_id'])
+            {
+                $temp['active'] = true;
+            }
+            else{
+                $temp['active']=false;
+            }
+
             if($firstName == NULL)
             {
                 $temp['author']='Xercise';
@@ -128,6 +145,14 @@ class planController extends Controller
             $temp = private_program::where('private_program_id', $plan['private_program_id'])->first();
             $firstName=coach::where('coach_id', $temp['coach_id'])->first('firstName');
             $lastName=coach::where('coach_id', $temp['coach_id'])->first('lastName');
+
+            if($user->active_private_program_id == $temp['private_program_id'])
+            {
+                $temp['active'] = true;
+            }
+            else{
+                $temp['active']=false;
+            }
 
             if($firstName == NULL)
             {
