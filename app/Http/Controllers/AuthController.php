@@ -47,7 +47,7 @@ class AuthController extends Controller
             'FirstName'=>['required','min:3','regex:/^[a-zA-Z ]+$/'],
     		'LastName'=>['required','min:3','regex:/^[a-zA-Z ]+$/'],
             'username'=>['required','min:3','unique:users','unique:coaches','regex:/^(?=.{3,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/'],
-            'email'=>['required','email:rfc,dns','unique:users','unique:coaches',],
+            'email'=>['required','unique:users','unique:coaches'],
             'password'=>['required','min:8','regex:/[A-Z]/','regex:/[0-9]/'],
             'gender'=>['required','in:Male,Female'],
             'encodedImage'=>['min:5'],

@@ -355,7 +355,6 @@ class userController extends Controller
         return response()->json($coach);
     }
 
-
     public function addOtherDefaultPlan(Request $request){
         $user = Auth::user();
         $validator = Validator::make($request->all(),[
