@@ -65,7 +65,6 @@ class planController extends Controller
         }
     }
 
-
     public function viewCustomPlans(){
         $user = Auth::user();
         $plans = private_program::query()->where('user_id', $user->user_id)->where('coach_id', NULL)->get('private_program_id');
@@ -149,7 +148,8 @@ class planController extends Controller
     }
 
     //view active plan details on homescreen
-    public function viewActivePlan(){       //Hrayr should return workout stats even if the day is rest
+    public function viewActivePlan(){       //TODO Hrayr should return workout stats even if the day is rest
+        //TODO this function is not working right
         $user = Auth::user();
         //user_id
         $card['user_id'] = $user->user_id;
@@ -220,8 +220,8 @@ class planController extends Controller
             $something = array();
             for($i=1;$i<=28;$i++){
                 $t = exercise_program::query()->where('program_id',$user->active_program_id)->where('day',$i)->pluck('ex_id');
-                for($j=0;$j<count($t);$j++){
-                    $temp =  exercise::query()->where('ex_id',$t[$j])->pluck('duration');
+                for($j=0;$j<count($t);$j++){    //TODO isRest
+                    $temp =  exercise::query()->where('ex_id',$t[$j])->pluck('duration');   //TODO remember to multiply this duration with reps and sets and stuff
                     $t[$j] = $temp[0];
                  }
                 $t = json_decode($t,true);
@@ -317,7 +317,6 @@ class planController extends Controller
 
     }
 
-
     public function currentWorkoutDetails(Request $request){
         //Note: the duration is mostly null in here because this is the duration put by the coach and it will mostly be reps and sets instead of duration
         $user = Auth::user();
@@ -365,7 +364,6 @@ class planController extends Controller
 
         return response()->json($details);
     }
-
 
     public function saveWorkoutStats(Request $request){
         $user = Auth::user();
@@ -927,7 +925,6 @@ class planController extends Controller
     public function createPlanCoach(Request $request){
         //TODO should we use the fact that we know the first day of the week to start the program
         //TODO jsondecode is causing problems with http requests we may have to remove it when combining with hrayr
-        //TODO username should be capable of being null
         $coach = Auth::user();
 
         $validator = Validator::make($request->all(),[
@@ -1965,7 +1962,7 @@ class planController extends Controller
 
     public function category($category){
         $category = strtolower($category);
-        $array=array('muscle fitness'=>1,'weight loss'=>2,'height increase'=>3,'stretching'=>4);
+        $array=array('muscle fitness'=>1,'muscle'=>1,'weight'=>2,'weight loss'=>2,'height'=>3,'height increase'=>3,'stretching'=>4);
         return $array[$category];
     }
 }
