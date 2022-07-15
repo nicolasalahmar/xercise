@@ -949,6 +949,27 @@ class planController extends Controller
         return response()->json(['message'=>'done']);
     }
 
+    public function isKneeIssues(Request $request){
+        $arr=array();
+        for ($i=1;$i<=7;$i++){
+            $day = $request[sprintf("day%u",$i)];
+            $day = json_decode($day,true);
+            foreach($day as $exercise){
+                array_push($arr,exercise::query()->where('ex_id',$exercise[0])->pluck('knee')[0]);
+            }
+
+        }
+        if(in_array('Yes',$arr,true)){
+            return 'Yes';
+        }
+        else if(in_array('A little',$arr,true)){
+            return 'A little';
+        }
+        else{
+            return 'No';
+        }
+    }
+
     public function createPlanCoach(Request $request){
         //TODO should we use the fact that we know the first day of the week to start the program
         //TODO jsondecode is causing problems with http requests we may have to remove it when combining with hrayr
@@ -970,7 +991,7 @@ class planController extends Controller
             $plan->name = $request->name;
             $plan->description = $request->description;
             $plan->rating = 0.0;
-            $plan->knee = 'Yes';
+            $plan->knee = $this->isKneeIssues($request);
             $plan->category = $request->category;
             $plan->duration = '00:00:00';
             $plan->kcal = 0.0;
