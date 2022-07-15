@@ -185,6 +185,7 @@ class planController extends Controller
         if($user->active_program_id != NULL){
 
             //plan name
+            //TODO if the plan does not exist this will not work
             $name = program::query()->where('program_id',$user->active_program_id)->pluck('name');
             $card['plan_name'] = $name[0];
             //author
@@ -264,6 +265,7 @@ class planController extends Controller
 
         if($user->active_private_program_id != NULL){
 
+            //TODO if the plan does not exist this will not work
             //plan name
             $name = private_program::query()->where('private_program_id',$user->active_private_program_id)->pluck('name');
             $card['plan_name'] = $name[0];
@@ -951,11 +953,9 @@ class planController extends Controller
         //TODO should we use the fact that we know the first day of the week to start the program
         //TODO jsondecode is causing problems with http requests we may have to remove it when combining with hrayr
         $coach = Auth::user();
-
         $validator = Validator::make($request->all(),[
             'name'=>['required','min:3','regex:/^[a-zA-Z ]+$/'],
     		'description'=>['required','min:3','max:50','regex:/^[a-zA-Z ]+$/'],
-            'knee'=>['required','in:Yes,No,A little'],
             'category'=>['required','in:muscle,weight,height,stretching'],
             'username'=>['exists:users,username'],
     	]);
@@ -970,13 +970,12 @@ class planController extends Controller
             $plan->name = $request->name;
             $plan->description = $request->description;
             $plan->rating = 0.0;
-            $plan->knee = $request->knee;
+            $plan->knee = 'Yes';
             $plan->category = $request->category;
             $plan->duration = '00:00:00';
             $plan->kcal = 0.0;
 
             $plan->save();
-
             $duration = 0;
             $Kcal = 0;
 
