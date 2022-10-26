@@ -4,11 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use App\Models\constants;
 use App\Models\user;
 use App\Models\coach;
 use App\Models\workout_stats;
-use App\Models\rating_coach;
 use App\Models\requests;
 use App\Models\enroll;
 use App\Models\private_enroll;
@@ -17,13 +15,12 @@ use App\Models\private_program;
 use App\Models\exercise_program;
 use App\Models\exercise_private_program;
 use App\Models\exercise;
+use App\Models\constants;
 
 
 use Auth;
 use Storage;
 use DB;
-use DateTime;
-use Carbon\Carbon;
 
 class planController extends Controller
 {
@@ -57,10 +54,18 @@ class planController extends Controller
         $user = Auth::user();
         if($request->has('program_id')){
             $req = enroll::query()->where('user_id', $user->user_id)->where('program_id',$request->program_id)->delete();
+            if($user->active_program_id == $request->program_id){
+                $user->active_program_id = null;
+                $user->save();
+            }
             return response()->json( ['success'=>(boolean)$req]);
         }
         if($request->has('private_program_id')){
             $req = private_enroll::query()->where('user_id', $user->user_id)->where('private_program_id',$request->private_program_id)->delete();
+            if($user->active_private_program_id == $request->private_program_id){
+                $user->active_private_program_id = null;
+                $user->save();
+            }
             return response()->json( ['success'=>(boolean)$req]);
         }
     }
@@ -173,7 +178,8 @@ class planController extends Controller
     }
 
     //view active plan details on homescreen
-    public function viewActivePlan(){       //TODO Hrayr should return workout stats even if the day is rest
+    public function viewActivePlan(){       //TODO Frontend should return workout stats even if the day is rest
+        //todo first thing to speed up is this method
         //TODO this function is not working right
         $user = Auth::user();
         //user_id
@@ -244,23 +250,30 @@ class planController extends Controller
             //all workout days
             //$temp[i][duration]=
             $something = array();
+            $card['all_workout_days'] = array();
             for($i=1;$i<=28;$i++){
+                $var = null;
                 $t = exercise_program::query()->where('program_id',$user->active_program_id)->where('day',$i)->pluck('ex_id');
-                for($j=0;$j<count($t);$j++){    //TODO isRest
-                    $temp =  exercise::query()->where('ex_id',$t[$j])->pluck('duration');   //TODO remember to multiply this duration with reps and sets and stuff
+                for($j=0;$j<count($t);$j++){
+                    $temp =  exercise::query()->where('ex_id',$t[$j])->pluck('duration');//TODO remember to multiply this duration with reps and sets and stuff
                     $t[$j] = $temp[0];
                  }
                 $t = json_decode($t,true);
                 $t = array_sum($t);
                 if(workout_stats::query()->where('user_id',$user->user_id)->where('program_id',$user->active_program_id)->where('day_num',$i)->exists()){
-                    $card['all_workout_days'][$i]['done']=true;
+                    $var['done']=true;
                 }
                 else{
-                    $card['all_workout_days'][$i]['done']=false;
+                    $var['done']=false;
                 }
-                $card['all_workout_days'][$i]['duration']=$t;
-            }
+                $var['duration']=$t;
 
+                $var['isRest'] = false;
+                if($var['duration'] == 0){
+                    $var['isRest'] = true;
+                }
+                array_push($card['all_workout_days'],$var);
+            }
         }
 
         if($user->active_private_program_id != NULL){
@@ -322,7 +335,9 @@ class planController extends Controller
 
             //all workout days
             $something = array();
+            $card['all_workout_days'] = array();
             for($i=1;$i<=28;$i++){
+                $var = null;
                 $t = exercise_private_program::query()->where('private_program_id',$user->active_private_program_id)->where('day',$i)->pluck('ex_id');
                 for($j=0;$j<count($t);$j++){
                     $temp =  exercise::query()->where('ex_id',$t[$j])->pluck('duration');
@@ -331,12 +346,18 @@ class planController extends Controller
                 $t = json_decode($t,true);
                 $t = array_sum($t);
                 if(workout_stats::query()->where('user_id',$user->user_id)->where('private_program_id',$user->active_private_program_id)->where('day_num',$i)->exists()){
-                    $card['all_workout_days'][$i]['done']=true;
+                    $var['done']=true;
                 }
                 else{
-                    $card['all_workout_days'][$i]['done']=false;
+                    $var['done']=false;
                 }
-                $card['all_workout_days'][$i]['duration']=$t;
+                $var['duration']=$t;
+
+                $var['isRest'] = false;
+                if($var['duration'] == 0){
+                    $var['isRest'] = true;
+                }
+                array_push($card['all_workout_days'],$var);
             }
         }
 
@@ -392,8 +413,8 @@ class planController extends Controller
         return response()->json($details);
     }
 
-    public function saveWorkoutStats(Request $request){
-        $user = Auth::user();
+    public function saveWorkoutStats(Request $request){ //todo you can add a new day regardless of the day_num for example if latest day is 4 you can add a day 3 no problem
+        $user = Auth::user();                            //todo there are a lot of problems with this function
 
         $validator = Validator::make($request->all(),[
             'duration'=>['required','date_format:H:i:s'],
@@ -413,7 +434,7 @@ class planController extends Controller
         $stats->kcal = $request->kcal;
         $stats->day_num = $request->day_num;
 
-        $duration = $this->sum_the_time($user->duration,$stats->duration);
+        $duration = constants::sum_the_time($user->duration,$stats->duration);
 
         $user->duration = $duration;
         $user->save();
@@ -427,45 +448,32 @@ class planController extends Controller
             }
         }
 
-        if($stats->save()){
-            return response()->json(["success"=>true, "message"=>"Stats Saved Successfully"]);
-        }else {
-            return response()->json(["success"=>false, "message"=>"Error Saving Stats"]);
+        if($user->active_program_id != NULL){
+            $latest_stats = workout_stats::where('user_id', $user->user_id)->where('program_id', $user->active_program_id)->orderBy('day_num', 'DESC')->first();
+        }
+        elseif ($user->active_private_program_id != NULL){
+            $latest_stats = workout_stats::where('user_id', $user->user_id)->where('private_program_id', $user->active_private_program_id)->orderBy('day_num', 'DESC')->first();
         }
 
-    }
-
-    function sum_the_time($time1, $time2) {
-        $times = array($time1, $time2);
-        $seconds = 0;
-        foreach ($times as $time)
-        {
-          list($hour,$minute,$second) = explode(':', $time);
-          $seconds += $hour*3600;
-          $seconds += $minute*60;
-          $seconds += $second;
+        if($latest_stats != NULL && $latest_stats->day_num == $stats->day_num){
+            $latest_stats->kcal = $stats->kcal;
+            $latest_stats->duration = $stats->duration;
+            if ($latest_stats->update()) {
+                return response()->json(["success" => true, "message" => "Stats Saved Successfully"]);
+            } else {
+                return response()->json(["success" => false, "message" => "Error Saving Stats"]);
+            }
         }
-        $hours = floor($seconds/3600);
-        $seconds -= $hours*3600;
-        $minutes  = floor($seconds/60);
-        $seconds -= $minutes*60;
-        if($seconds < 9)
-        {
-        $seconds = "0".$seconds;
+        else {
+            if ($stats->save()) {
+                return response()->json(["success" => true, "message" => "Stats Saved Successfully"]);
+            } else {
+                return response()->json(["success" => false, "message" => "Error Saving Stats"]);
+            }
         }
-        if($minutes < 9)
-        {
-        $minutes = "0".$minutes;
-        }
-          if($hours < 9)
-        {
-        $hours = "0".$hours;
-        }
-        return "{$hours}:{$minutes}:{$seconds}";
     }
 
     public function createCustomPlan(Request $request){
-        //TODO jsondecode is causing problems with http requests we may have to remove it when combining with hrayr
         $user = Auth::user();
 
         $validator = Validator::make($request->all(),[
@@ -532,7 +540,7 @@ class planController extends Controller
             $ex4->save();
         }else{
             $day1 = $request->day1;
-            $day1 = json_decode($day1,true);
+            //$day1 = json_decode($day1,true);
             foreach($day1 as $day){
                 $ex1 = new exercise_private_program();
                 $ex2 = new exercise_private_program();
@@ -595,7 +603,7 @@ class planController extends Controller
             $ex4->save();
         }else{
             $day2 = $request->day2;
-            $day2 = json_decode($day2,true);
+            //$day2 = json_decode($day2,true);
             foreach($day2 as $day){
                 $ex1 = new exercise_private_program();
                 $ex2 = new exercise_private_program();
@@ -658,7 +666,7 @@ class planController extends Controller
             $ex4->save();
         }else{
             $day3 = $request->day3;
-            $day3 = json_decode($day3,true);
+            //$day3 = json_decode($day3,true);
             foreach($day3 as $day){
                 $ex1 = new exercise_private_program();
                 $ex2 = new exercise_private_program();
@@ -721,7 +729,7 @@ class planController extends Controller
             $ex4->save();
         }else{
             $day4 = $request->day4;
-            $day4 = json_decode($day4,true);
+            //$day4 = json_decode($day4,true);
             foreach($day4 as $day){
                 $ex1 = new exercise_private_program();
                 $ex2 = new exercise_private_program();
@@ -784,7 +792,7 @@ class planController extends Controller
             $ex4->save();
         }else{
             $day5 = $request->day5;
-            $day5 = json_decode($day5,true);
+            //$day5 = json_decode($day5,true);
             foreach($day5 as $day){
                 $ex1 = new exercise_private_program();
                 $ex2 = new exercise_private_program();
@@ -847,7 +855,7 @@ class planController extends Controller
             $ex4->save();
         }else{
             $day6 = $request->day6;
-            $day6 = json_decode($day6,true);
+            //$day6 = json_decode($day6,true);
             foreach($day6 as $day){
                 $ex1 = new exercise_private_program();
                 $ex2 = new exercise_private_program();
@@ -910,7 +918,7 @@ class planController extends Controller
             $ex4->save();
         }else{
             $day7 = $request->day7;
-            $day7 = json_decode($day7,true);
+            //$day7 = json_decode($day7,true);
             foreach($day7 as $day){
                 $ex1 = new exercise_private_program();
                 $ex2 = new exercise_private_program();
@@ -953,7 +961,7 @@ class planController extends Controller
         $arr=array();
         for ($i=1;$i<=7;$i++){
             $day = $request[sprintf("day%u",$i)];
-            $day = json_decode($day,true);
+            //$day = json_decode($day,true);
             foreach($day as $exercise){
                 array_push($arr,exercise::query()->where('ex_id',$exercise[0])->pluck('knee')[0]);
             }
@@ -972,12 +980,13 @@ class planController extends Controller
 
     public function createPlanCoach(Request $request){
         //TODO should we use the fact that we know the first day of the week to start the program
-        //TODO jsondecode is causing problems with http requests we may have to remove it when combining with hrayr
         $coach = Auth::user();
         $validator = Validator::make($request->all(),[
-            'name'=>['required','min:3','regex:/^[a-zA-Z ]+$/'],
-    		'description'=>['required','min:3','max:50','regex:/^[a-zA-Z ]+$/'],
-            'category'=>['required','in:muscle,weight,height,stretching'],
+            //'name'=>['required','min:3','regex:/^[a-zA-Z ]+$/'],
+            'name'=>['required','min:3'], //todo i removed the regex part so we can add a number to the name of the plan
+    		//'description'=>['required','min:3','max:50','regex:/^[a-zA-Z ]+$/'],
+    		'description'=>['required','min:3','max:50'],
+            'category'=>['required','in:Muscle,Weight,Height,Stretching,muscle,weight,height,stretching'],//todo Frontend made it capital letter so now i changed it
             'username'=>['exists:users,username'],
     	]);
         if($validator->fails()){
@@ -997,6 +1006,8 @@ class planController extends Controller
             $plan->kcal = 0.0;
 
             $plan->save();
+            $coach->programs = $coach->programs + 1;
+            $coach->save();
             $duration = 0;
             $Kcal = 0;
 
@@ -1032,7 +1043,7 @@ class planController extends Controller
             $ex4->save();
         }else{
             $day1 = $request->day1;
-            $day1 = json_decode($day1,true);
+            //$day1 = json_decode($day1,true);
             foreach($day1 as $day){
                 $ex1 = new exercise_program();
                 $ex2 = new exercise_program();
@@ -1095,7 +1106,7 @@ class planController extends Controller
             $ex4->save();
         }else{
             $day2 = $request->day2;
-            $day2 = json_decode($day2,true);
+            //$day2 = json_decode($day2,true);
             foreach($day2 as $day){
                 $ex1 = new exercise_program();
                 $ex2 = new exercise_program();
@@ -1158,7 +1169,7 @@ class planController extends Controller
             $ex4->save();
         }else{
             $day3 = $request->day3;
-            $day3 = json_decode($day3,true);
+            //$day3 = json_decode($day3,true);
             foreach($day3 as $day){
                 $ex1 = new exercise_program();
                 $ex2 = new exercise_program();
@@ -1221,7 +1232,7 @@ class planController extends Controller
             $ex4->save();
         }else{
             $day4 = $request->day4;
-            $day4 = json_decode($day4,true);
+            //$day4 = json_decode($day4,true);
             foreach($day4 as $day){
                 $ex1 = new exercise_program();
                 $ex2 = new exercise_program();
@@ -1284,7 +1295,7 @@ class planController extends Controller
             $ex4->save();
         }else{
             $day5 = $request->day5;
-            $day5 = json_decode($day5,true);
+            //$day5 = json_decode($day5,true);
             foreach($day5 as $day){
                 $ex1 = new exercise_program();
                 $ex2 = new exercise_program();
@@ -1347,7 +1358,7 @@ class planController extends Controller
             $ex4->save();
         }else{
             $day6 = $request->day6;
-            $day6 = json_decode($day6,true);
+            //$day6 = json_decode($day6,true);
             foreach($day6 as $day){
                 $ex1 = new exercise_program();
                 $ex2 = new exercise_program();
@@ -1410,7 +1421,7 @@ class planController extends Controller
             $ex4->save();
         }else{
             $day7 = $request->day7;
-            $day7 = json_decode($day7,true);
+            //$day7 = json_decode($day7,true);
             foreach($day7 as $day){
                 $ex1 = new exercise_program();
                 $ex2 = new exercise_program();
@@ -1471,6 +1482,8 @@ class planController extends Controller
             $plan->kcal = 0.0;
 
             $plan->save();
+            $coach->programs = $coach->programs + 1;
+            $coach->save();
 
             $duration = 0;
             $Kcal = 0;
@@ -1513,9 +1526,8 @@ class planController extends Controller
                 $ex3->save();
                 $ex4->save();
             }else{
-                //TODO jsondecode is causing problems with http requests we may have to remove it when combining with hrayr
                 $day1 = $request->day1;
-                $day1 = json_decode($day1,true);
+                //$day1 = json_decode($day1,true);
                 foreach($day1 as $day){
                     $ex1 = new exercise_private_program();
                     $ex2 = new exercise_private_program();
@@ -1578,7 +1590,7 @@ class planController extends Controller
                 $ex4->save();
             }else{
                 $day2 = $request->day2;
-                $day2 = json_decode($day2,true);
+                //$day2 = json_decode($day2,true);
                 foreach($day2 as $day){
                     $ex1 = new exercise_private_program();
                     $ex2 = new exercise_private_program();
@@ -1641,7 +1653,7 @@ class planController extends Controller
                 $ex4->save();
             }else{
                 $day3 = $request->day3;
-                $day3 = json_decode($day3,true);
+                //$day3 = json_decode($day3,true);
                 foreach($day3 as $day){
                     $ex1 = new exercise_private_program();
                     $ex2 = new exercise_private_program();
@@ -1704,7 +1716,7 @@ class planController extends Controller
                 $ex4->save();
             }else{
                 $day4 = $request->day4;
-                $day4 = json_decode($day4,true);
+                //$day4 = json_decode($day4,true);
                 foreach($day4 as $day){
                     $ex1 = new exercise_private_program();
                     $ex2 = new exercise_private_program();
@@ -1767,7 +1779,7 @@ class planController extends Controller
                 $ex4->save();
             }else{
                 $day5 = $request->day5;
-                $day5 = json_decode($day5,true);
+                //$day5 = json_decode($day5,true);
                 foreach($day5 as $day){
                     $ex1 = new exercise_private_program();
                     $ex2 = new exercise_private_program();
@@ -1830,7 +1842,7 @@ class planController extends Controller
                 $ex4->save();
             }else{
                 $day6 = $request->day6;
-                $day6 = json_decode($day6,true);
+                //$day6 = json_decode($day6,true);
                 foreach($day6 as $day){
                     $ex1 = new exercise_private_program();
                     $ex2 = new exercise_private_program();
@@ -1893,7 +1905,7 @@ class planController extends Controller
                 $ex4->save();
             }else{
                 $day7 = $request->day7;
-                $day7 = json_decode($day7,true);
+                //$day7 = json_decode($day7,true);
                 foreach($day7 as $day){
                     $ex1 = new exercise_private_program();
                     $ex2 = new exercise_private_program();
@@ -1945,7 +1957,7 @@ class planController extends Controller
         $times_a_week = $user->times_a_week;
         $time_per_day = $user->time_per_day;
         $time_per_day = ($time_per_day - 10)/5 + 1;
-        $category = $this->category($category);
+        $category = constants::category($category);
 
         $c = ($category-1)*105;
         $d = ($difficulty-1)*35;
@@ -2003,11 +2015,5 @@ class planController extends Controller
     public function addDefaultPlan(Request $request){
         $user = Auth::user();
         return $this->enrollInDefaultPlan($request->category,$user);
-    }
-
-    public function category($category){
-        $category = strtolower($category);
-        $array=array('muscle fitness'=>1,'muscle'=>1,'weight'=>2,'weight loss'=>2,'height'=>3,'height increase'=>3,'stretching'=>4);
-        return $array[$category];
     }
 }

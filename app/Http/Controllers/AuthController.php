@@ -4,19 +4,16 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use App\Models\user;
 use App\Models\coach;
 use App\Models\enroll;
 use App\Models\body_stats;
-use Illuminate\Auth\AuthenticationException;
 use App\Models\constants;
 
 use Auth;
 use Storage;
 use DB;
-use DateTime;
 
 class AuthController extends Controller
 {
@@ -24,7 +21,6 @@ class AuthController extends Controller
 
         $imageName = $type.'_'.($usr_id).'.jpg';
         $imagePath = ((string)constants::image_path).$type.'_'.($usr_id).'.jpg';
-        //$imagePath = 'D:/Laravel Projects/Xercise/storage/app/Images/'.$type.'_'.($usr_id).'.jpg';
         $encodedImage = base64_decode($encodedImage);
         if(!gettype(file_put_contents($imagePath,$encodedImage)))
         {
@@ -85,6 +81,7 @@ class AuthController extends Controller
         $knee = $request->knee;
         $week_start = $request->week_start;
 
+        //creating the user record
         $user = user::query()->create([
             'FirstName'=>$FirstName,
             'LastName'=>$LastName,
@@ -109,13 +106,17 @@ class AuthController extends Controller
            // 'steps'=>0,
             //'step_update'=>date('Y-m-d'),
         ]);
+        //---------------------------------------------------------------
 
+        //saving the original weight as a record in the body stats table
         $temp = new body_stats();
         $temp->user_id = $user->user_id;
         $temp->weight = $weight;
         $temp->date = date('y-m-d');
         $temp->save();
+        //---------------------------------------------------------------
 
+        //adding the user to a default plan
         app('App\Http\Controllers\planController')->enrollInDefaultPlan($user->initial_plan,$user);
         //get all plans this user is enrolled in (it should be only one plan that we created right now)
         $temp = enroll::query()->where('user_id',$user->user_id)->get('program_id');
@@ -124,15 +125,18 @@ class AuthController extends Controller
             $user->active_program_id = $temp[0]['program_id'];
             $user->save();
         }
+        //---------------------------------------------------------------
 
+        //checking that the user is instantiated correctly and adding the image if included
         if($user->user_id){
             if($request->has('encodedImage'))
                 $this->saveImage((string)$user->user_id,$request->encodedImage,'users');
-            return response()->json(['success'=>true,'message'=>'User created successfully']); //NOTE: image is true when image is uploaded or when there is no image
+            return response()->json(['success'=>true,'message'=>'User created successfully']);
         }
         else {
-            return response()->json(['success'=>false,'message'=>"User wasn't created successfully"]); //NOTE: image is true when image is uploaded or when there is no image
+            return response()->json(['success'=>false,'message'=>"User wasn't created successfully"]);
         }
+        //---------------------------------------------------------------
     }
 
     public function createCoach(Request $request){
@@ -168,10 +172,10 @@ class AuthController extends Controller
 
         //return $contents;
         if (!isset( $contents[$coach_num])){
-            return response()->json(['success'=>false,'errors'=>"coach id not found"],400);
+            return response()->json(['success'=>false,'message'=>"coach id not found"],400);
         }
         else if ($contents[$coach_num]['active']){
-            return response()->json(['success'=>false,'errors'=>"coach id already taken and active"],400);
+            return response()->json(['success'=>false,'message'=>"coach id already taken and active"],400);
         }
 
         $contents[$coach_num]['active']=true; //set coach to active
@@ -208,7 +212,13 @@ class AuthController extends Controller
     }
 
     public function splashScreen(Request $request){
-        return response()->json(['success'=>true]);
+        $user = Auth::user()->token();
+
+        if($user->scopes==["coach"])
+            return response()->json(['success'=>true,'type'=>'coach']);
+
+        elseif ($user->scopes==["user"])
+            return response()->json(['success'=>true,'type'=>'user']);
     }
 
     public function coachLogin(Request $request)
@@ -264,7 +274,7 @@ class AuthController extends Controller
 
             config(['auth.guards.api.provider' => 'user']);
 
-            $user = user::select('users.*')->find(auth()->guard('user')->user()->user_id);    //i fucked up here
+            $user = user::select('users.*')->find(auth()->guard('user')->user()->user_id);
             $success =  $user;
             $success['token'] =  $user->createToken('MyApp',['user'])->accessToken;
             $success['type'] = "user";
@@ -277,7 +287,6 @@ class AuthController extends Controller
             $success['email_correct'] = user::where('email', $request->email)->exists();
             $success['success'] = false;
             return $success;
-            //return response()->json(['error' => ['Email and Password are Wrong.']], 200);
         }
     }
 
@@ -289,7 +298,7 @@ class AuthController extends Controller
         ]);
 
         if($validator->fails()){
-            return response()->json(['error' => $validator->errors()->all()]);
+            return response()->json(['message' => $validator->errors()->all()]);
         }
 
         $b = $this->userLogin($request);
@@ -300,7 +309,7 @@ class AuthController extends Controller
         }
         else{
             if($b['email_correct']){
-                return response()->json(['success'=>false,'errors'=>"password is wrong"],400);
+                return response()->json(['success'=>false,'message'=>"password is wrong"],400);
             }
             $b = $this->coachLogin($request);
             if($b['success']){
@@ -309,9 +318,9 @@ class AuthController extends Controller
             }
             else{
                 if($b['email_correct']){
-                    return response()->json(['success'=>false,'errors'=>"password is wrong"],400);
+                    return response()->json(['success'=>false,'message'=>"password is wrong"],400);
                 }
-                return response()->json(['success'=>false,'errors'=>"Email and Password are Wrong."],200);
+                return response()->json(['success'=>false,'message'=>"Email and Password are Wrong."],200);
             }
         }
     }

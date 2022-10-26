@@ -13,5 +13,9 @@ class rating_program extends Model
 
     public $fillable=['rating'];
 
+    public $timestamps = false;
+
+    public $incrementing = false;
+
     use HasFactory;
 }

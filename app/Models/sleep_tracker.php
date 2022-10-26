@@ -13,5 +13,6 @@ class sleep_tracker extends Model
 
     public $fillable=['hours'];
 
+    public $timestamps = false;
     use HasFactory;
 }

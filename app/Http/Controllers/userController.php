@@ -10,6 +10,7 @@ use App\Models\coach;
 use App\Models\workout_stats;
 use App\Models\body_stats;
 use App\Models\rating_coach;
+use App\Models\rating_program;
 use App\Models\enroll;
 use App\Models\private_enroll;
 use App\Models\program;
@@ -27,16 +28,11 @@ class userController extends Controller
 
     public function saveImage($usr_id,$encodedImage){
         $path = constants::image_path;
-        $imageName = 'users_'.($usr_id).'.jpg';
         $path = ($path).'users_'.($usr_id).'.jpg';
         $encodedImage = base64_decode($encodedImage);
-        if(!gettype(file_put_contents(($path),$encodedImage)))
-        {
-            return false;
-        }
-        else {
-                return true;
-        }
+        DB::table('users')->where('user_id',$usr_id)->update(['image'=>'users_'.($usr_id).'.jpg']);
+        $b = (!gettype(file_put_contents(($path),$encodedImage)));
+        return ($b)? false:true;
     }
 
 
@@ -66,8 +62,6 @@ class userController extends Controller
             'pushups'=>['required','in:1,2,3,4,5'],
             'plank'=>['required','in:1,2,3,4,5'],
             'knee'=>['required','in:Yes,No,A little'],
-            'height'=>['required','numeric','gt:0'],
-            'weight'=>['required','numeric','gt:0'],
     	]);
 
     	if($validator->fails()){
@@ -78,9 +72,6 @@ class userController extends Controller
         $user->LastName = $request->LastName;
         $user->gender = $request->gender;
         $user->DOB = $request->DOB;
-        $user->height = $request->height;
-        $user->height_new = $request->height;
-        $user->weight = $request->weight;
         $user->week_start = $request->week_start;
         $user->times_a_week = $request->times_a_week;
         $user->time_per_day = $request->time_per_day;
@@ -141,23 +132,41 @@ class userController extends Controller
 
     public function ratePlan(Request $request){
         $user = Auth::user();
+        $program_id = $request->program_id;
+
         $validator = Validator::make($request->all(),[
             'rating'=>['required','in:1,2,3,4,5'],
             'program_id'=>['required','exists:programs,program_id'],
         ]);
+
         if($validator->fails()){
             return $validator->errors()->all();
         }
 
-        $rating = $request->rating;
-        $plan_id = $request->program_id;
-
-        if (DB::table('rating_programs')->where('user_id',$user->user_id)->where('program_id',$plan_id)->exists()){
-            return response()->json(['message'=>(boolean)DB::table('rating_programs')->where('user_id',$user->user_id)->where('program_id',$plan_id)->update(['rating'=>$request->rating])]);
+        if (rating_program::query()->where('user_id',$user->user_id)->where('program_id',$program_id)->exists()){
+            rating_program::query()->where('user_id',$user->user_id)->where('program_id',$program_id)->update(['rating'=>$request->rating]);
         }
         else{
-            return response()->json(['message'=>DB::table('rating_programs')->insert(['user_id'=>$user->user_id,'program_id'=>$plan_id,'rating'=>$rating])]);
+            $rate = new rating_program();
+            $rate->program_id = $program_id;
+            $rate->user_id = $user->user_id;
+            $rate->rating = $request->rating;
+
+            if(!$rate->save()){
+                return response()->json(["success"=>false, "message"=>"Error submitting rate."]);
+            }
         }
+        $sum=0.0;
+        $new_rate = rating_program::query()->select('rating')->where('program_id',$program_id)->get();
+        foreach($new_rate as $single_rate){
+            $sum +=(integer)$single_rate['rating'];
+        }
+        $avg = $sum/count($new_rate);
+        $avg *=2;
+
+        program::query()->where('program_id',$program_id)->update(['rating'=>$avg]);
+
+        return response()->json(["success"=>true, "message"=>"Rated program successfully."]);
     }
 
     public function viewUserDashboard(){
@@ -221,10 +230,18 @@ class userController extends Controller
         $user = Auth::user();
         if($request->has('program_id')){
             $req = enroll::query()->where('user_id', $user->user_id)->where('program_id',$request->program_id)->delete();
+            if($user->active_program_id == $request->program_id){
+                $user->active_program_id = null;
+                $user->save();
+            }
             return response()->json( ['success'=>$req]);
         }
         if($request->has('private_program_id')){
             $req = private_enroll::query()->where('user_id', $user->user_id)->where('private_program_id',$request->private_program_id)->delete();
+            if($user->active_private_program_id == $request->private_program_id){
+                $user->active_private_program_id = null;
+                $user->save();
+            }
             return response()->json( ['success'=>$req]);
         }
         else{
@@ -297,17 +314,17 @@ class userController extends Controller
         $last_date = DB::table('sleep_trackers')->where('user_id',$user->user_id)->orderBy('date','DESC')->first();
 
         if($last_date == null){
-            $result = DB::table('sleep_trackers')->insert(['hours'=>$request->hours,'date'=>date('y-m-d'),'user_id'=>$user->user_id]);
+            $result = DB::table('sleep_trackers')->insert(['hours'=>$request->hours,'date'=>date('Y-m-d'),'user_id'=>$user->user_id]);
             return response()->json(['message'=>$result]);
         }
         else{
             $last_date = $last_date->date;
         }
-        $last_date = Carbon::parse($last_date)->format('y-m-d');
-        $request_date = Carbon::now()->format('y-m-d');
+        $last_date = Carbon::parse($last_date)->format('Y-m-d');
+        $request_date = Carbon::now()->format('Y-m-d');
 
         if($request_date > $last_date){
-            $result = DB::table('sleep_trackers')->insert(['hours'=>$request->hours,'date'=>date('y-m-d'),'user_id'=>$user->user_id]);
+            $result = DB::table('sleep_trackers')->insert(['hours'=>$request->hours,'date'=>date('Y-m-d'),'user_id'=>$user->user_id]);
             return response()->json(['message'=>$result]);
         }
         else{
@@ -400,7 +417,7 @@ class userController extends Controller
 
             $dates = workout_stats::query()->where('user_id', $user->user_id)->where('program_id',$user->active_program_id)->pluck('created_at');
             for($i=0;$i<count($dates);$i++){
-                $dates[$i] = $dates[$i]->format('y-m-d');
+                $dates[$i] = $dates[$i]->format('Y-m-d');
             }
 
             $stats['workout_dates'] = $dates;
@@ -431,7 +448,7 @@ class userController extends Controller
 
             $dates = workout_stats::query()->where('user_id', $user->user_id)->where('private_program_id',$user->active_private_program_id)->pluck('created_at');
             for($i=0;$i<count($dates);$i++){
-                $dates[$i] = $dates[$i]->format('y-m-d');
+                $dates[$i] = $dates[$i]->format('Y-m-d');
             }
 
             $stats['workout_dates'] = $dates;
@@ -463,7 +480,7 @@ class userController extends Controller
     public function saveWeight(Request $request){
         $user = Auth::user();
         $validator = Validator::make($request->all(),[
-            'date'=>['required','date','before:'.Carbon::now()->format('y-m-d')],
+            'date'=>['required','date','before:'.Carbon::now()->modify('+1 day')->format('y-m-d')],
             'weight'=>['required','numeric','min:30'],
             ]);
         if($validator->fails()){

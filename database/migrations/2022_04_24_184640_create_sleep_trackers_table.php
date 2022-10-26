@@ -15,8 +15,7 @@ return new class extends Migration
     {
         Schema::create('sleep_trackers', function (Blueprint $table) {
             $table->float('hours');
-            $table->date('date')->unique();
-
+            $table->date('date');
 
             $table->unsignedBigInteger('user_id');
         	$table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');

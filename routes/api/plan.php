@@ -18,7 +18,8 @@ use App\Http\Controllers\AuthController;
 
 Route::group( ['prefix' => 'user','middleware' => ['auth:user-api','scopes:user'] ],function(){
     Route::get('viewuserplans','planController@viewUserPlans');
-    Route::get('returnactiveplan','planController@viewActivePlan');
+    Route::get('returnactiveplan',[planController::class,'viewActivePlan']);
+    //Route::get('returnactiveplan','planController@viewActivePlan');
     Route::post('activateplan','planController@activatePlan');
     Route::post('resetplanprogress','planController@resetPlanProgress');
     Route::post('deleteuserplan','planController@deletePlan');
